@@ -7,7 +7,11 @@
     <script src='js/bundle.js' charset='utf-8'></script>
   </head>
   <body>
-    <input id='main-input' name='main-input' type='text' value=''>
+    <section class='main'>
+      <div class='area-window' id='area-window'></div>
+      <input class='input' id='main-input' name='main-input' type='text' value="">
+      <div class='player-window' id='player-window'></div>
+    </section>
   </body>
 </html>
 
@@ -25,11 +29,59 @@
     background: #332;
   }
 
-  #main-input {
+  .main {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: auto;
+    width: 430px;
+  }
+
+  .input, .area-window, .player-window {
+    border: 1px solid #c90;
+    border-radius: 4px;
+    margin-top: 4px;
+    width: 430px;
+  }
+
+  .area-window, .player-window {
     background: #000;
-    position: relative;
-    top: 20px;
-    left: 20px;
+    min-height: 226px;
+    padding: 18px;
+    width: 386px;
+  }
+
+  .input {
+    background: #321;
+    font-size: 18px;
+    min-height: 30px;
+    padding-left: 9px;
+    transition: width .4s;
+    width: 244px;
+  }
+
+  .input:focus {
+    background: #000;
+    transition: width .4s;
+    width: 412px;
+  }
+
+  .input:hover {
+    transition: width .4s;
+    width: 412px;
+  }
+
+  n, v {
+    font-weight: 300;
+  }
+
+  n {
+    color: #c99607;
+  }
+
+  v {
+    color: #bcb7b4;
   }
 
 </style>
