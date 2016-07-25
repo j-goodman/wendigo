@@ -15,6 +15,8 @@ var init = function () {
       inputId: 'main-input',
       areaId: 'area-window',
       playerId: 'player-window',
+      // highlightId: 'highlight-input',
+      inventory: 'inventory',
     }),
     spawnpoint: 'backroom',
     worldMap: game.worldMap,
