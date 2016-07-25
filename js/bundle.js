@@ -284,7 +284,7 @@
 	var worldMap = {};
 	
 	worldMap.backroom = __webpack_require__(7);
-	worldMap.studio = __webpack_require__(8);
+	worldMap.studio = __webpack_require__(9);
 	
 	module.exports = worldMap;
 
@@ -346,7 +346,7 @@
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(6);
-	var Item = __webpack_require__(9);
+	var Item = __webpack_require__(8);
 	var Exit = __webpack_require__(5);
 	
 	area = new Area ({
@@ -382,6 +382,39 @@
 
 /***/ },
 /* 8 */
+/***/ function(module, exports) {
+
+	Item = function (args) {
+	  this.checkText = args.checkText;
+	  this.name = args.name;
+	  this.verbs = args.verbs;
+	};
+	
+	Item.prototype["check"] = function (noun, player) {
+	  player.display(noun.checkText);
+	};
+	
+	Item.prototype["use"] = function (noun, player) {
+	  player.display(noun.checkText);
+	  console.log("Used item.");
+	};
+	
+	Item.prototype["get"] = function (noun, player) {
+	  player.display(noun.checkText);
+	  player.inventory.push(noun);
+	  player.updateInventory();
+	  // remove self from area
+	};
+	
+	Item.prototype["@"] = function (noun, player) {
+	  Item.prototype["use"](noun, player);
+	};
+	
+	module.exports = Item;
+
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
@@ -434,39 +467,6 @@
 	});
 	
 	module.exports = area;
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	Item = function (args) {
-	  this.checkText = args.checkText;
-	  this.name = args.name;
-	  this.verbs = args.verbs;
-	};
-	
-	Item.prototype["check"] = function (noun, player) {
-	  player.display(noun.checkText);
-	};
-	
-	Item.prototype["use"] = function (noun, player) {
-	  player.display(noun.checkText);
-	  console.log("Used item.");
-	};
-	
-	Item.prototype["get"] = function (noun, player) {
-	  player.display(noun.checkText);
-	  player.inventory.push(noun);
-	  player.updateInventory();
-	  // remove self from area
-	};
-	
-	Item.prototype["@"] = function (noun, player) {
-	  Item.prototype["use"](noun, player);
-	};
-	
-	module.exports = Item;
 
 
 /***/ }
