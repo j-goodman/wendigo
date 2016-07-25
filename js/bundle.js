@@ -370,7 +370,7 @@
 	
 	    new Item ({
 	      name: "small key",
-	      checkText: "An old key ring with one <n>small key</n> on it.",
+	      checkText: "An old key ring with one <n>small key</n> on it. If you want to take it with you you can <v>get</v> it.",
 	      verbs: ["check", "get"],
 	    }),
 	
