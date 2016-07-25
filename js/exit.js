@@ -2,6 +2,9 @@ Exit = function (args) {
   this.name = args.name;
   this.checkText = args.checkText;
   this.destinationName = args.destinationName;
+  this.locked = args.locked;
+  this.lockCheck = args.lockCheck;
+  this.keyName = args.keyName;
 };
 
 Exit.prototype["go to"] = function (noun, player) {
