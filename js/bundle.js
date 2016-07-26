@@ -106,7 +106,6 @@
 	  this.input = document.getElementById(args.inputId);
 	  this.areaWindow = document.getElementById(args.areaId);
 	  this.playerWindow = document.getElementById(args.playerId);
-	  // this.highlightedInput = document.getElementById(args.highlightId);
 	  this.inventory = document.getElementById(args.inventory);
 	  this.player = args.player;
 	};
@@ -119,9 +118,6 @@
 	      input.value = '';
 	    }
 	  }.bind(this);
-	  input.onkeyup = function (event) {
-	    input.value = this.player.highlight(input.value);
-	  }.bind(this);
 	};
 	
 	Book.prototype.clearInventory = function () {
@@ -133,7 +129,12 @@
 	};
 	
 	Book.prototype.readArea = function (area) {
-	  this.areaWindow.innerHTML = area.description;
+	  var description = "";
+	  description += area.description;
+	  for (var x = 0; x < area.contents.length; x++) {
+	    description += " " + area.contents[x].description;
+	  }
+	  this.areaWindow.innerHTML = description;
 	};
 	
 	Book.prototype.readCheck = function (object) {
@@ -259,7 +260,6 @@
 	
 	Player.prototype.updateInventory = function () {
 	  this.book.clearInventory();
-	  console.log("Updating inventory.");
 	  this.inventory.forEach(function (item) {
 	    this.book.displayInventory(item);
 	  }.bind(this));
@@ -300,6 +300,7 @@
 	  this.locked = args.locked;
 	  this.lockCheck = args.lockCheck;
 	  this.keyName = args.keyName;
+	  this.description = args.description;
 	};
 	
 	Exit.prototype["go to"] = function (noun, player) {
@@ -327,6 +328,7 @@
 	  this.checkText = args.checkText;
 	  this.name = args.name;
 	  this.verbs = args.verbs;
+	  this.description = args.description;
 	};
 	
 	Feature.prototype["check"] = function (noun, player) {
@@ -350,7 +352,7 @@
 	var Exit = __webpack_require__(5);
 	
 	area = new Area ({
-	  description: "A cramped back room in an artist's studio. Some pipes line the far wall, on another wall is a green <n>door</n>. There is a <n>small key</n> and a <n>magazine</n> on the floor. You can <v>check</v> something to get a description of it (i.e., \"<v>check</v> <n>magazine</n>\"). You can also <v>go to</v> the green <n>door</n>.",
+	  description: "A cramped back room in an artist's studio. Some pipes line the far wall.",
 	  name: 'backroom',
 	  nouns: ['small key', 'door', 'magazine'],
 	  verbs: ['@', 'check', 'go to', 'get'],
@@ -358,19 +360,22 @@
 	  contents: [
 	    new Exit ({
 	      name: "door",
-	      checkText: "A green <n>door</n>. <v>go to</v>?",
+	      checkText: "A green <n>door</n>. You can <v>go to</v> <n>door</n> to leave the room.",
+	      description: "On the wall next to you is a green <n>door</n>.",
 	      destinationName: 'studio',
 	      verbs: ["check", "go to"],
 	    }),
 	    new Feature ({
 	      name: "magazine",
 	      checkText: "It looks like an old science fiction <n>magazine</n>, but you can't read the language.",
+	      description: "On a low table in the corner is a <n>magazine</n>. You can <v>check</v> something to get a description of it (i.e., \"<v>check</v> <n>magazine</n>\").",
 	      verbs: ["check"],
 	    }),
 	
 	    new Item ({
 	      name: "small key",
 	      checkText: "An old key ring with one <n>small key</n> on it. If you want to take it with you you can <v>get</v> it.",
+	      description: "There is a <n>small key</n> on the floor.",
 	      verbs: ["check", "get"],
 	    }),
 	
@@ -388,6 +393,7 @@
 	  this.checkText = args.checkText;
 	  this.name = args.name;
 	  this.verbs = args.verbs;
+	  this.description = args.description;
 	};
 	
 	Item.prototype["check"] = function (noun, player) {
@@ -400,10 +406,20 @@
 	};
 	
 	Item.prototype["get"] = function (noun, player) {
-	  player.display(noun.checkText);
+	  var message = (noun.name + " added to your inventory.");
+	  var firstLetter = message.slice(0, 1);
+	  message = message.slice(1, message.length);
+	  message = firstLetter.toUpperCase()+message;
 	  player.inventory.push(noun);
+	  player.display(message);
 	  player.updateInventory();
-	  // remove self from area
+	  for (var x = 0; x < player.location.contents.length; x++) {
+	    if (player.location.contents[x].name === noun.name) {
+	      player.location.contents.splice(x, 1);
+	      x--;
+	    }
+	  }
+	  player.book.readArea(player.location);
 	};
 	
 	Item.prototype["@"] = function (noun, player) {
@@ -422,41 +438,46 @@
 	var Exit = __webpack_require__(5);
 	
 	var area = new Area ({
-	  description: "A painter's studio. A stretched, <n>empty canvas</n> leans against the east wall, the sun shines through a <n>window</n> opposite, on the west wall. Overhead a ceiling fan drifts in steady circles. In front of the window is an unfinished <n>painting</n>. Beside the empty canvases is a green <n>door</n>. There's a <n>locked door</n> on the north wall.",
+	  description: "A painter's studio. Overhead a ceiling fan drifts in steady circles.",
 	  name: 'studio',
 	  nouns: ['door', 'painting', 'window', 'empty canvas', 'locked door'],
 	  verbs: ['@', 'check', 'go to'],
 	  worldMap: this,
 	  contents: [
 	
+	    new Feature ({
+	      name: "empty canvas",
+	      checkText: "It's a blank white canvas.",
+	      description: "A stretched, <n>empty canvas</n> leans against the east wall.",
+	      verbs: ["check"],
+	    }),
+	
 	    new Exit ({
 	      name: "door",
 	      checkText: "A green <n>door</n>. <v>go to</v>?",
+	      description: "Beside the empty canvases is a green <n>door</n>.",
 	      destinationName: 'backroom',
 	      verbs: ["check", "go to"],
 	    }),
 	
 	    new Feature ({
-	      name: "painting",
-	      checkText: "Strokes of paint streak the canvas, not enough yet for them to unite into any shape with meaning. The colors are dark burning browns and yellows. Acrylic paint.",
-	      verbs: ["check"],
-	    }),
-	
-	    new Feature ({
-	      name: "empty canvas",
-	      checkText: "It's a blank white canvas.",
-	      verbs: ["check"],
-	    }),
-	
-	    new Feature ({
 	      name: "window",
 	      checkText: "The snow has melted away in the parking lot outside except for where it had already been gathered into piles.",
+	      description: "The sun shines through a <n>window</n> opposite, on the west wall.",
+	      verbs: ["check"],
+	    }),
+	
+	    new Feature ({
+	      name: "painting",
+	      checkText: "Strokes of paint streak the canvas, not enough yet for them to unite into any shape with meaning. The colors are dark burning browns and yellows. Acrylic paint.",
+	      description: "In front of the window is an unfinished <n>painting</n>.",
 	      verbs: ["check"],
 	    }),
 	
 	    new Feature ({
 	      name: "locked door",
 	      checkText: "It's locked.",
+	      description: "There's a <n>locked door</n> on the north wall.",
 	      locked: true,
 	      lockCheck: "You can't get through the <n>locked door</n>",
 	      keyName: "small key",
