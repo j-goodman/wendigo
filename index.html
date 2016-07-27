@@ -7,12 +7,17 @@
     <script src='js/bundle.js' charset='utf-8'></script>
   </head>
   <body>
-    <section class='main'>
-      <div class='area-window' id='area-window'></div>
-      <input class='input' id='main-input' name='main-input' type='text' value="">
-      <!-- <div class='input' id='highlight-input'></div> -->
-      <div class='player-window' id='player-window'></div>
-      <ul id='inventory'></ul>
+    <section class='container'>
+      <section class='main'>
+        <div class='area-window' id='area-window'></div>
+        <input class='input' id='main-input' name='main-input' type='text' value="">
+        <!-- <div class='input' id='highlight-input'></div> -->
+        <div class='player-window' id='player-window'></div>
+      </section>
+      <section class='sidebar'>
+        <ul class='inventory' id='inventory'></ul>
+        <ul class='inventory' id='inventory'></ul>
+      </section>
     </section>
   </body>
 </html>
@@ -35,6 +40,14 @@
     background: #000;
   }
 
+  .container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: auto;
+    width: 680px;
+  }
+
   .main {
     align-items: center;
     background: #321;
@@ -42,18 +55,39 @@
     display: flex;
     flex-direction: column;
     height: 740px;
-    margin: auto;
     position: relative;
     top: -16px;
     padding-top: 32px;
-    width: 70%;
+    width: 460px;
   }
 
-  .input, .area-window, .player-window {
+  .sidebar {
+    align-items: center;
+    background: #321;
+    border: 1px solid #332;
+    display: flex;
+    flex-direction: column;
+    height: 740px;
+    position: relative;
+    top: -16px;
+    padding-top: 32px;
+    width: 200px;
+  }
+
+  .input, .area-window, .player-window, .inventory {
     border: 1px solid #c90;
     border-radius: 4px;
     margin-top: 4px;
     width: 430px;
+  }
+
+  .inventory {
+    background: #000;
+    min-height: 182px;
+    height: auto;
+    padding-top: 12px;
+    text-align: left;
+    width: 120px;
   }
 
   .area-window, .player-window {
@@ -72,17 +106,6 @@
     transition: width .4s;
     width: 230px;
   }
-
-  /*#highlight-input {
-    line-height: 30px;
-    position: relative;
-    bottom: 37px;
-  }
-
-  #main-input {
-    opacity: 0;
-    z-index: 1000;
-  }*/
 
   .input:focus {
     background: #000;

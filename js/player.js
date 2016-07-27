@@ -110,7 +110,6 @@ Player.prototype.lookAround = function () {
 
 Player.prototype.updateInventory = function () {
   this.book.clearInventory();
-  console.log("Updating inventory.");
   this.inventory.forEach(function (item) {
     this.book.displayInventory(item);
   }.bind(this));
