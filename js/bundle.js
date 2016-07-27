@@ -360,7 +360,7 @@
 	  contents: [
 	    new Exit ({
 	      name: "door",
-	      checkText: "A green <n>door</n>. You can <v>go to</v> <n>door</n> to leave the room.",
+	      checkText: "A green <n>door</n>. You can <v>go to</v> it to leave the room.",
 	      description: "On the wall next to you is a green <n>door</n>.",
 	      destinationName: 'studio',
 	      verbs: ["check", "go to"],
