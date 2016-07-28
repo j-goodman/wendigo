@@ -166,6 +166,9 @@
 	  for (var x = 0 ; x < this.location.contents.length ; x++) {
 	    nouns.push(this.location.contents[x].name);
 	  }
+	  for (x = 0 ; x < this.inventory.length ; x++) {
+	    nouns.push(this.inventory[x].name);
+	  }
 	  for (x = 0 ; x < this.location.verbs.length ; x++) {
 	    verbs.push(this.location.verbs[x]);
 	  }
@@ -195,6 +198,8 @@
 	    this.display("");
 	    if (this.location.getNoun(noun)) {
 	      noun = this.location.getNoun(noun);
+	    } else if (this.getInventoryNoun(noun)) {
+	      noun = this.getInventoryNoun(noun);
 	    } else {
 	      this.display("Unknown <n>noun</n>");
 	    }
@@ -214,6 +219,15 @@
 	      this.display("You can't do that <v>verb</v> to that <n>noun</n>. Try " + verbs);
 	    }
 	  }
+	};
+	
+	Player.prototype.getInventoryNoun = function (name) {
+	  for (var x = 0 ; x < this.inventory.length ; x++) {
+	    if (this.inventory[x].name === name) {
+	      return this.inventory[x];
+	    }
+	  }
+	  return false;
 	};
 	
 	Player.prototype.display = function (text) {
@@ -365,7 +379,8 @@
 	      destinationName: 'studio',
 	      verbs: ["check", "go to"],
 	    }),
-	    new Feature ({
+	
+	    new Item ({
 	      name: "magazine",
 	      checkText: "It looks like an old science fiction <n>magazine</n>, but you can't read the language.",
 	      description: "On a low table in the corner is a <n>magazine</n>. You can <v>check</v> something to get a description of it (i.e., \"<v>check</v> <n>magazine</n>\").",
@@ -377,6 +392,9 @@
 	      checkText: "An old key ring with one <n>small key</n> on it. If you want to take it with you you can <v>get</v> it.",
 	      description: "There is a <n>small key</n> on the floor.",
 	      verbs: ["check", "get"],
+	      onGet: function () {
+	        this.checkText = "An old key ring with one <n>small key</n> on it.";
+	      },
 	    }),
 	
 	  ],
@@ -394,6 +412,7 @@
 	  this.name = args.name;
 	  this.verbs = args.verbs;
 	  this.description = args.description;
+	  this.onGet = args.onGet;
 	};
 	
 	Item.prototype["check"] = function (noun, player) {
@@ -406,20 +425,27 @@
 	};
 	
 	Item.prototype["get"] = function (noun, player) {
-	  var message = (noun.name + " added to your inventory.");
-	  var firstLetter = message.slice(0, 1);
-	  message = message.slice(1, message.length);
-	  message = firstLetter.toUpperCase()+message;
-	  player.inventory.push(noun);
-	  player.display(message);
-	  player.updateInventory();
-	  for (var x = 0; x < player.location.contents.length; x++) {
-	    if (player.location.contents[x].name === noun.name) {
-	      player.location.contents.splice(x, 1);
-	      x--;
+	  if (!player.inventory.includes(noun)) {
+	    var message = (noun.name + "</n>" + " added to your inventory.");
+	    var firstLetter = message.slice(0, 1);
+	    message = message.slice(1, message.length);
+	    message = '<n>' + firstLetter.toUpperCase() + message;
+	    player.inventory.push(noun);
+	    player.display(message);
+	    player.updateInventory();
+	    for (var x = 0; x < player.location.contents.length; x++) {
+	      if (player.location.contents[x].name === noun.name) {
+	        player.location.contents.splice(x, 1);
+	        x--;
+	      }
 	    }
+	    if (noun.onGet) {
+	      noun.onGet();
+	    }
+	    player.book.readArea(player.location);
+	  } else {
+	    player.display("You already have that.");
 	  }
-	  player.book.readArea(player.location);
 	};
 	
 	Item.prototype["@"] = function (noun, player) {
