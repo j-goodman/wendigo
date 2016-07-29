@@ -80,9 +80,29 @@
 	  this.description = args.description;
 	  this.contents = args.contents;
 	  this.name = args.name;
-	  this.nouns = args.nouns;
-	  this.verbs = args.verbs;
 	  this.worldMap = args.worldMap;
+	  this.getNouns = function () {
+	    var nouns = [];
+	    for (var x = 0 ; x < this.contents.length ; x++) {
+	      nouns.push(this.contents[x].name);
+	    }
+	    return nouns;
+	  }.bind(this);
+	  this.getVerbs = function () {
+	    var verbs = [];
+	    for (var x = 0 ; x < this.contents.length ; x++) {
+	      console.log(this.contents[x]);
+	      console.log(this.contents[x].verbs);
+	      for (var y = 0 ; y < this.contents[x].verbs.length ; y++) {
+	        if (!verbs.includes(this.contents[x].verbs[y])) {
+	          verbs.push(this.contents[x].verbs[y]);
+	        }
+	      }
+	    }
+	    return verbs;
+	  }.bind(this);
+	  this.nouns = this.getNouns();
+	  this.verbs = this.getVerbs();
 	};
 	
 	Area.prototype.getNoun = function (name) {
@@ -314,6 +334,7 @@
 	  this.locked = args.locked;
 	  this.lockCheck = args.lockCheck;
 	  this.keyName = args.keyName;
+	  this.verbs = args.verbs;
 	  this.description = args.description;
 	};
 	
@@ -368,13 +389,11 @@
 	area = new Area ({
 	  description: "A cramped back room in an artist's studio. Some pipes line the far wall.",
 	  name: 'backroom',
-	  nouns: ['small key', 'door', 'magazine'],
-	  verbs: ['@', 'check', 'go to', 'get'],
 	  worldMap: this,
 	  contents: [
 	    new Exit ({
 	      name: "door",
-	      checkText: "A green <n>door</n>. You can <v>go to</v> <n>door</n> to leave the room.",
+	      checkText: "A green <n>door</n>. You can <v>go to</v> it to leave the room.",
 	      description: "On the wall next to you is a green <n>door</n>.",
 	      destinationName: 'studio',
 	      verbs: ["check", "go to"],
@@ -466,8 +485,6 @@
 	var area = new Area ({
 	  description: "A painter's studio. Overhead a ceiling fan drifts in steady circles.",
 	  name: 'studio',
-	  nouns: ['door', 'painting', 'window', 'empty canvas', 'locked door'],
-	  verbs: ['@', 'check', 'go to'],
 	  worldMap: this,
 	  contents: [
 	

@@ -5,8 +5,6 @@ var Exit = require('../exit.js');
 var area = new Area ({
   description: "A painter's studio. Overhead a ceiling fan drifts in steady circles.",
   name: 'studio',
-  nouns: ['door', 'painting', 'window', 'empty canvas', 'locked door'],
-  verbs: ['@', 'check', 'go to'],
   worldMap: this,
   contents: [
 
