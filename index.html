@@ -4,45 +4,88 @@
     <meta content='text/html;charset=utf-8' http-equiv='Content-Type'>
     <meta content='utf-8' http-equiv='encoding'>
     <title>The Wendigo</title>
-    <script src='js/bundle.js' charset='utf-8'></script>
+    <script src='js/wendigo.js' charset='utf-8'></script>
   </head>
   <body>
-    <section class='main'>
-      <div class='area-window' id='area-window'></div>
-      <input class='input' id='main-input' name='main-input' type='text' value="">
-      <div class='player-window' id='player-window'></div>
+    <section class='container'>
+      <section class='main'>
+        <div class='area-window' id='area-window'></div>
+        <input class='input' id='main-input' name='main-input' type='text' value="">
+        <div class='player-window' id='player-window'></div>
+      </section>
+      <section class='sidebar'>
+        <ul class='inventory' id='inventory'></ul>
+        <ul class='inventory' id='inventory'></ul>
+      </section>
     </section>
   </body>
 </html>
 
 <style media='screen'>
   h1, body, p, input {
-    font-family: monospace;
-    font-family: American Typewriter;
+    font-family: American Typewriter, monospace;
     color: #fe8;
     border: inherit;
     width: inherit;
     height: inherit;
   }
 
+  ul {
+    list-style: none;
+  }
+
   body {
-    background: #332;
+    background: #000;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: auto;
+    width: 680px;
   }
 
   .main {
     align-items: center;
+    background: #321;
+    border: 1px solid #332;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    margin: auto;
-    width: 430px;
+    height: 740px;
+    position: relative;
+    top: -16px;
+    padding-top: 32px;
+    width: 460px;
   }
 
-  .input, .area-window, .player-window {
+  .sidebar {
+    align-items: center;
+    background: #321;
+    border: 1px solid #332;
+    display: flex;
+    flex-direction: column;
+    height: 740px;
+    position: relative;
+    top: -16px;
+    padding-top: 32px;
+    width: 200px;
+  }
+
+  .input, .area-window, .player-window, .inventory {
     border: 1px solid #c90;
     border-radius: 4px;
     margin-top: 4px;
     width: 430px;
+  }
+
+  .inventory {
+    background: #000;
+    min-height: 182px;
+    height: auto;
+    padding-top: 12px;
+    text-align: left;
+    width: 120px;
   }
 
   .area-window, .player-window {
@@ -54,11 +97,12 @@
 
   .input {
     background: #321;
+    bottom: 40px;
     font-size: 18px;
-    min-height: 30px;
+    height: 30px;
     padding-left: 9px;
     transition: width .4s;
-    width: 244px;
+    width: 230px;
   }
 
   .input:focus {
@@ -70,10 +114,6 @@
   .input:hover {
     transition: width .4s;
     width: 412px;
-  }
-
-  n, v {
-    font-weight: 300;
   }
 
   n {

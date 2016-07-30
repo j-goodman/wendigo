@@ -1,6 +1,7 @@
 Player = function (args) {
   this.book = args.book;
   this.location = args.worldMap[args.spawnpoint];
+  this.inventory = [];
 };
 
 Player.prototype.getInput = function (input) {
@@ -12,11 +13,11 @@ Player.prototype.parseInput = function (input) {
   var nouns = [];
   var verb;
   var noun;
-  for (var x = 0 ; x < this.location.exits.length ; x++) {
-    nouns.push(this.location.exits[x].name);
+  for (var x = 0 ; x < this.location.contents.length ; x++) {
+    nouns.push(this.location.contents[x].name);
   }
-  for (x = 0 ; x < this.location.features.length ; x++) {
-    nouns.push(this.location.features[x].name);
+  for (x = 0 ; x < this.inventory.length ; x++) {
+    nouns.push(this.inventory[x].name);
   }
   for (x = 0 ; x < this.location.verbs.length ; x++) {
     verbs.push(this.location.verbs[x]);
@@ -47,6 +48,8 @@ Player.prototype.executeCommand = function (verb, noun) {
     this.display("");
     if (this.location.getNoun(noun)) {
       noun = this.location.getNoun(noun);
+    } else if (this.getInventoryNoun(noun)) {
+      noun = this.getInventoryNoun(noun);
     } else {
       this.display("Unknown <n>noun</n>");
     }
@@ -68,27 +71,48 @@ Player.prototype.executeCommand = function (verb, noun) {
   }
 };
 
+Player.prototype.getInventoryNoun = function (name) {
+  for (var x = 0 ; x < this.inventory.length ; x++) {
+    if (this.inventory[x].name === name) {
+      return this.inventory[x];
+    }
+  }
+  return false;
+};
+
 Player.prototype.display = function (text) {
   this.book.playerWindow.innerHTML = text;
 };
 
-Player.prototype.highlight = function (text) {
-  // var nouns = this.location.nouns;
-  // var verbs = this.location.verbs;
-  // for (x = 0 ; x < text.length-1 ; x++) {
-  //   for (var y = 1 ; y < text.length ; y++) {
-  //     if (nouns.includes(text.slice(x, y))) {
-  //       var output = text;
-  //       if (text.slice(x-3, x) !== "<b>") {
-  //         output = [text.slice(0, x), "<b>", text.slice(x)].join('');
-  //         output = [output.slice(0, y+3), "</b>", output.slice(y+3)].join('');
-  //       }
-  //       return output;
-  //     }
-  //   }
-  // }
-  return text;
-};
+// Player.prototype.highlight = function (text) {
+//   this.book.highlightedInput.innerHTML = text;
+//   var nouns = this.location.nouns;
+//   var verbs = this.location.verbs;
+//   for (x = 0 ; x < text.length-1 ; x++) {
+//     for (var y = 1 ; y < text.length ; y++) {
+//       var output;
+//       if (nouns.includes(text.slice(x, y))) {
+//         output = text;
+//         if (text.slice(x-3, x) !== "<n>") {
+//           output = [text.slice(0, x), "<n>", text.slice(x)].join('');
+//           output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
+//         }
+//         this.book.highlightedInput.innerHTLM = output;
+//         return output;
+//       } else if (verbs.includes(text.slice(x, y))) {
+//         output = text;
+//         if (text.slice(x-3, x) !== "<v>") {
+//           output = [text.slice(0, x), "<v>", text.slice(x)].join('');
+//           output = [output.slice(0, y+3), "</v>", output.slice(y+3)].join('');
+//         }
+//         this.book.highlightedInput.innerHTLM = output;
+//         return output;
+//
+//       }
+//     }
+//   }
+//   return text;
+// };
 
 Player.prototype.enterArea = function () {
   this.lookAround();
@@ -96,6 +120,13 @@ Player.prototype.enterArea = function () {
 
 Player.prototype.lookAround = function () {
   this.book.readArea(this.location);
+};
+
+Player.prototype.updateInventory = function () {
+  this.book.clearInventory();
+  this.inventory.forEach(function (item) {
+    this.book.displayInventory(item);
+  }.bind(this));
 };
 
 Player.prototype.init = function () {
