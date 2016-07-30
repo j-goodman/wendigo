@@ -29,6 +29,14 @@ Item.prototype["get"] = function (noun, player) {
         player.location.contents.splice(x, 1);
         x--;
       }
+      if (player.location.contents[x].contents) {
+        for (var y = 0; y < player.location.contents[x].contents.length; y++) {
+          if (player.location.contents[x].contents[y].name === noun.name) {
+            player.location.contents[x].contents.splice(y, 1);
+            y--;
+          }
+        }
+      }
     }
     if (noun.onGet) {
       noun.onGet();

@@ -15,10 +15,10 @@ var init = function () {
       inputId: 'main-input',
       areaId: 'area-window',
       playerId: 'player-window',
-      // highlightId: 'highlight-input',
       inventory: 'inventory',
+      highlighter: 'highlighter',
     }),
-    spawnpoint: 'backroom',
+    spawnpoint: 'farmhouse',
     worldMap: game.worldMap,
   });
   game.player.init();

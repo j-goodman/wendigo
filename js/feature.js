@@ -7,10 +7,13 @@ Feature = function (args) {
 
 Feature.prototype["check"] = function (noun, player) {
   player.display(noun.checkText);
+  if (this.onCheck) {
+    this.onCheck();
+  }
 };
 
 Feature.prototype["@"] = function (noun, player) {
-  Feature.prototype["check"](noun, player);
+  this["check"]();
 };
 
 module.exports = Feature;

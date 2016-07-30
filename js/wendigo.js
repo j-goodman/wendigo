@@ -61,10 +61,10 @@
 	      inputId: 'main-input',
 	      areaId: 'area-window',
 	      playerId: 'player-window',
-	      // highlightId: 'highlight-input',
 	      inventory: 'inventory',
+	      highlighter: 'highlighter',
 	    }),
-	    spawnpoint: 'backroom',
+	    spawnpoint: 'farmhouse',
 	    worldMap: game.worldMap,
 	  });
 	  game.player.init();
@@ -78,6 +78,7 @@
 
 	Area = function (args) {
 	  this.description = args.description;
+	  this.postscript = args.postscript;
 	  this.contents = args.contents;
 	  this.name = args.name;
 	  this.worldMap = args.worldMap;
@@ -85,17 +86,29 @@
 	    var nouns = [];
 	    for (var x = 0 ; x < this.contents.length ; x++) {
 	      nouns.push(this.contents[x].name);
+	      if (this.contents[x].contents) {
+	        for (var z = 0 ; z < this.contents[x].contents.length ; z++) {
+	          nouns.push(this.contents[x].contents[z].name);
+	        }
+	      }
 	    }
 	    return nouns;
 	  }.bind(this);
 	  this.getVerbs = function () {
 	    var verbs = [];
 	    for (var x = 0 ; x < this.contents.length ; x++) {
-	      console.log(this.contents[x]);
-	      console.log(this.contents[x].verbs);
 	      for (var y = 0 ; y < this.contents[x].verbs.length ; y++) {
 	        if (!verbs.includes(this.contents[x].verbs[y])) {
 	          verbs.push(this.contents[x].verbs[y]);
+	        }
+	      }
+	      if (this.contents[x].contents) {
+	        for (var z = 0 ; z < this.contents[x].contents.length ; z++) {
+	          for (var a = 0 ; a < this.contents[x].contents[z].verbs.length ; a++) {
+	            if (!verbs.includes(this.contents[x].contents[z].verbs[a])) {
+	              verbs.push(this.contents[x].contents[z].verbs[a]);
+	            }
+	          }
 	        }
 	      }
 	    }
@@ -109,6 +122,13 @@
 	  for (var x = 0 ; x < this.contents.length ; x++) {
 	    if (this.contents[x].name === name) {
 	      return this.contents[x];
+	    }
+	    if (this.contents[x].contents) {
+	      for (var y = 0 ; y < this.contents[x].contents.length ; y++) {
+	        if (this.contents[x].contents[y].name === name) {
+	          return this.contents[x].contents[y];
+	        }
+	      }
 	    }
 	  }
 	  return false;
@@ -127,6 +147,7 @@
 	  this.areaWindow = document.getElementById(args.areaId);
 	  this.playerWindow = document.getElementById(args.playerId);
 	  this.inventory = document.getElementById(args.inventory);
+	  this.highlighter = document.getElementById(args.highlighter);
 	  this.player = args.player;
 	};
 	
@@ -137,6 +158,16 @@
 	      this.player.getInput(input.value);
 	      input.value = '';
 	    }
+	  }.bind(this);
+	  this.highlighter.onclick = function () {
+	    if (this.player.highlightOff) {
+	      this.player.highlightOff = false;
+	      this.highlighter.className = 'highlighter';
+	    } else {
+	      this.player.highlightOff = true;
+	      this.highlighter.className = 'off';
+	    }
+	    this.player.lookAround();
 	  }.bind(this);
 	};
 	
@@ -154,11 +185,11 @@
 	  for (var x = 0; x < area.contents.length; x++) {
 	    description += " " + area.contents[x].description;
 	  }
+	  if (area.postscript) {
+	    description += " " + area.postscript;
+	  }
+	  description = this.player.highlight(description);
 	  this.areaWindow.innerHTML = description;
-	};
-	
-	Book.prototype.readCheck = function (object) {
-	  this.playerWindow.value = object.check;
 	};
 	
 	module.exports = Book;
@@ -172,6 +203,7 @@
 	  this.book = args.book;
 	  this.location = args.worldMap[args.spawnpoint];
 	  this.inventory = [];
+	  this.highlightOff = false;
 	};
 	
 	Player.prototype.getInput = function (input) {
@@ -179,18 +211,13 @@
 	};
 	
 	Player.prototype.parseInput = function (input) {
-	  var verbs = [];
-	  var nouns = [];
+	  input = input.toLowerCase();
+	  var verbs = this.location.verbs;
+	  var nouns = this.location.nouns;
 	  var verb;
 	  var noun;
-	  for (var x = 0 ; x < this.location.contents.length ; x++) {
-	    nouns.push(this.location.contents[x].name);
-	  }
 	  for (x = 0 ; x < this.inventory.length ; x++) {
 	    nouns.push(this.inventory[x].name);
-	  }
-	  for (x = 0 ; x < this.location.verbs.length ; x++) {
-	    verbs.push(this.location.verbs[x]);
 	  }
 	  var verbEnd = 0;
 	  for (x = 0 ; x < input.length ; x++) {
@@ -251,38 +278,37 @@
 	};
 	
 	Player.prototype.display = function (text) {
-	  this.book.playerWindow.innerHTML = text;
+	  this.book.playerWindow.innerHTML = this.highlight(text);
 	};
 	
-	// Player.prototype.highlight = function (text) {
-	//   this.book.highlightedInput.innerHTML = text;
-	//   var nouns = this.location.nouns;
-	//   var verbs = this.location.verbs;
-	//   for (x = 0 ; x < text.length-1 ; x++) {
-	//     for (var y = 1 ; y < text.length ; y++) {
-	//       var output;
-	//       if (nouns.includes(text.slice(x, y))) {
-	//         output = text;
-	//         if (text.slice(x-3, x) !== "<n>") {
-	//           output = [text.slice(0, x), "<n>", text.slice(x)].join('');
-	//           output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
-	//         }
-	//         this.book.highlightedInput.innerHTLM = output;
-	//         return output;
-	//       } else if (verbs.includes(text.slice(x, y))) {
-	//         output = text;
-	//         if (text.slice(x-3, x) !== "<v>") {
-	//           output = [text.slice(0, x), "<v>", text.slice(x)].join('');
-	//           output = [output.slice(0, y+3), "</v>", output.slice(y+3)].join('');
-	//         }
-	//         this.book.highlightedInput.innerHTLM = output;
-	//         return output;
-	//
-	//       }
-	//     }
-	//   }
-	//   return text;
-	// };
+	Player.prototype.highlight = function (text) {
+	  if (this.highlightOff) {
+	    return text;
+	  }
+	  var nouns = this.location.nouns;
+	  var verbs = this.location.verbs;
+	  for (x = 0 ; x < text.length-1 ; x++) {
+	    for (var y = 1 ; y < text.length ; y++) {
+	      var output;
+	      if (nouns.includes(text.slice(x, y))) {
+	        output = text;
+	        if (text.slice(x-3, x) !== "<n>") {
+	          output = [text.slice(0, x), "<n>", text.slice(x)].join('');
+	          output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
+	        }
+	        text = output;
+	      } else if (verbs.includes(text.slice(x, y))) {
+	        output = text;
+	        if (text.slice(x-3, x) !== "<v>") {
+	          output = [text.slice(0, x), "<v>", text.slice(x)].join('');
+	          output = [output.slice(0, y+3), "</v>", output.slice(y+3)].join('');
+	        }
+	        text = output;
+	      }
+	    }
+	  }
+	  return text;
+	};
 	
 	Player.prototype.enterArea = function () {
 	  this.lookAround();
@@ -319,6 +345,7 @@
 	
 	worldMap.backroom = __webpack_require__(7);
 	worldMap.studio = __webpack_require__(9);
+	worldMap.farmhouse = __webpack_require__(10);
 	
 	module.exports = worldMap;
 
@@ -368,10 +395,13 @@
 	
 	Feature.prototype["check"] = function (noun, player) {
 	  player.display(noun.checkText);
+	  if (this.onCheck) {
+	    this.onCheck();
+	  }
 	};
 	
 	Feature.prototype["@"] = function (noun, player) {
-	  Feature.prototype["check"](noun, player);
+	  this["check"]();
 	};
 	
 	module.exports = Feature;
@@ -457,6 +487,14 @@
 	        player.location.contents.splice(x, 1);
 	        x--;
 	      }
+	      if (player.location.contents[x].contents) {
+	        for (var y = 0; y < player.location.contents[x].contents.length; y++) {
+	          if (player.location.contents[x].contents[y].name === noun.name) {
+	            player.location.contents[x].contents.splice(y, 1);
+	            y--;
+	          }
+	        }
+	      }
 	    }
 	    if (noun.onGet) {
 	      noun.onGet();
@@ -531,6 +569,145 @@
 	});
 	
 	module.exports = area;
+
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Area = __webpack_require__(1);
+	var Feature = __webpack_require__(6);
+	var Box = __webpack_require__(11);
+	var Item = __webpack_require__(8);
+	var Exit = __webpack_require__(5);
+	
+	area = new Area ({
+	  description: "A single-room building, about ten yards wide in either direction, with walls made from cinder blocks and roughly applied concrete.",
+	  name: 'farmhouse',
+	  worldMap: this,
+	  contents: [
+	    new Feature ({
+	      name: "floor",
+	      description: "The floor is lined by oak planks made grey with a thin coating of ash.",
+	      checkText: "The ash on the floor is soft and feels as if it's still warm. The planks are in disrepair and have large cracks between them and splinters on their upward faces.",
+	      verbs: ["check"],
+	    }),
+	    new Feature ({
+	      name: "table",
+	      description: "You are lying face-up on a wooden table. If you want to know more about the table, you can check it.",
+	      checkText: "The table is made of a smooth, light wood, and is very cool to the touch, almost seeming to radiate cold into the warm humid air of the small concrete building.",
+	      verbs: ["check"],
+	
+	      onCheck: function () {
+	        this.desctiption = "There is a wooden table in the middle of the room.";
+	      },
+	    }),
+	    new Feature ({
+	      name: "other table",
+	      description: "Nearby there is an other table, very similar to the first",
+	      checkText: "Like its twin, this one is made of a cool, light, smooth wood. There is a dead man lying face-up on top of it.",
+	      verbs: ["check"],
+	    }),
+	    new Feature ({
+	      name: "dead man",
+	      description: "A dead man is lying on top of it.",
+	      checkText: "The dead man looks like he's in is mid-forties, healthy aside from being dead. His eyes are open, looking up a the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
+	      verbs: ["check"],
+	    }),
+	    new Box ({
+	      name: "pockets",
+	      description: "",
+	      contents: [
+	        new Item ({
+	          name: "watch",
+	          checkText: "It's a wrist watch with a fraying leather band that feels slightly moist and smells like sweat. It's eleven thirty.",
+	          description: "a watch",
+	          verbs: ["check", "get"],
+	        }),
+	        new Item ({
+	          name: "keys",
+	          checkText: "An aluminium ring of keys with a small silver key on it and a larger black car key.",
+	          description: "a set of keys",
+	          verbs: ["check", "get"],
+	        }),
+	        new Item ({
+	          name: "dollar bill",
+	          checkText: "A one dollar bill. If you want to take it with you, you can get it.",
+	          description: "a dollar bill",
+	          verbs: ["check", "get"],
+	        }),
+	        new Item ({
+	          name: "phone",
+	          checkText: "It's a smartphone. It has run out of charge.",
+	          description: "a phone",
+	          verbs: ["check", "get"],
+	        }),
+	      ],
+	      checkText: "The dead man's pockets contain",
+	      verbs: ["check"],
+	    }),
+	
+	    new Exit ({
+	      name: "door",
+	      checkText: "A green wooden door. You can go to it to leave the building. Outside you can hear insects buzzing in the night.",
+	      description: "On the wall next to you is a green door.",
+	      destinationName: 'wheatfield',
+	      verbs: ["check", "go to"],
+	    }),
+	  ],
+	});
+	
+	module.exports = area;
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	Box = function (args) {
+	  this.checkText = args.checkText;
+	  this.contents = args.contents;
+	  this.postscript = args.postscript;
+	  this.name = args.name;
+	  this.verbs = args.verbs;
+	  this.description = args.description;
+	};
+	
+	Box.prototype["check"] = function (noun, player) {
+	  var description = noun.checkText + " ";
+	  if (noun.contents.length === 0) {
+	    description += "nothing.";
+	    description = player.highlight(description);
+	    player.display(description);
+	    return undefined;
+	  }
+	  if (noun.contents.length === 1) {
+	    description += noun.contents[0].description + ".";
+	    description = player.highlight(description);
+	    player.display(description);
+	    return undefined;
+	  }
+	  for (var x = 0 ; x < noun.contents.length-1 ; x++) {
+	    description += noun.contents[x].description;
+	    description += ", ";
+	  }
+	  description += "and " + noun.contents[noun.contents.length-1].description;
+	  if (noun.postscript) {
+	    description += noun.postscript;
+	  }
+	  description += ".";
+	  description = player.highlight(description);
+	  player.display(description);
+	  if (this.onCheck) {
+	    this.onCheck();
+	  }
+	};
+	
+	Box.prototype["@"] = function (noun, player) {
+	  this["check"]();
+	};
+	
+	module.exports = Box;
 
 
 /***/ }
