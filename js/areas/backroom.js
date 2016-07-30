@@ -6,8 +6,6 @@ var Exit = require('../exit.js');
 area = new Area ({
   description: "A cramped back room in an artist's studio. Some pipes line the far wall.",
   name: 'backroom',
-  nouns: ['small key', 'door', 'magazine'],
-  verbs: ['@', 'check', 'go to', 'get'],
   worldMap: this,
   contents: [
     new Exit ({
@@ -17,7 +15,8 @@ area = new Area ({
       destinationName: 'studio',
       verbs: ["check", "go to"],
     }),
-    new Feature ({
+
+    new Item ({
       name: "magazine",
       checkText: "It looks like an old science fiction <n>magazine</n>, but you can't read the language.",
       description: "On a low table in the corner is a <n>magazine</n>. You can <v>check</v> something to get a description of it (i.e., \"<v>check</v> <n>magazine</n>\").",
@@ -29,6 +28,9 @@ area = new Area ({
       checkText: "An old key ring with one <n>small key</n> on it. If you want to take it with you you can <v>get</v> it.",
       description: "There is a <n>small key</n> on the floor.",
       verbs: ["check", "get"],
+      onGet: function () {
+        this.checkText = "An old key ring with one <n>small key</n> on it.";
+      },
     }),
 
   ],

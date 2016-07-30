@@ -16,6 +16,9 @@ Player.prototype.parseInput = function (input) {
   for (var x = 0 ; x < this.location.contents.length ; x++) {
     nouns.push(this.location.contents[x].name);
   }
+  for (x = 0 ; x < this.inventory.length ; x++) {
+    nouns.push(this.inventory[x].name);
+  }
   for (x = 0 ; x < this.location.verbs.length ; x++) {
     verbs.push(this.location.verbs[x]);
   }
@@ -45,6 +48,8 @@ Player.prototype.executeCommand = function (verb, noun) {
     this.display("");
     if (this.location.getNoun(noun)) {
       noun = this.location.getNoun(noun);
+    } else if (this.getInventoryNoun(noun)) {
+      noun = this.getInventoryNoun(noun);
     } else {
       this.display("Unknown <n>noun</n>");
     }
@@ -64,6 +69,15 @@ Player.prototype.executeCommand = function (verb, noun) {
       this.display("You can't do that <v>verb</v> to that <n>noun</n>. Try " + verbs);
     }
   }
+};
+
+Player.prototype.getInventoryNoun = function (name) {
+  for (var x = 0 ; x < this.inventory.length ; x++) {
+    if (this.inventory[x].name === name) {
+      return this.inventory[x];
+    }
+  }
+  return false;
 };
 
 Player.prototype.display = function (text) {

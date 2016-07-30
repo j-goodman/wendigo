@@ -80,9 +80,29 @@
 	  this.description = args.description;
 	  this.contents = args.contents;
 	  this.name = args.name;
-	  this.nouns = args.nouns;
-	  this.verbs = args.verbs;
 	  this.worldMap = args.worldMap;
+	  this.getNouns = function () {
+	    var nouns = [];
+	    for (var x = 0 ; x < this.contents.length ; x++) {
+	      nouns.push(this.contents[x].name);
+	    }
+	    return nouns;
+	  }.bind(this);
+	  this.getVerbs = function () {
+	    var verbs = [];
+	    for (var x = 0 ; x < this.contents.length ; x++) {
+	      console.log(this.contents[x]);
+	      console.log(this.contents[x].verbs);
+	      for (var y = 0 ; y < this.contents[x].verbs.length ; y++) {
+	        if (!verbs.includes(this.contents[x].verbs[y])) {
+	          verbs.push(this.contents[x].verbs[y]);
+	        }
+	      }
+	    }
+	    return verbs;
+	  }.bind(this);
+	  this.nouns = this.getNouns();
+	  this.verbs = this.getVerbs();
 	};
 	
 	Area.prototype.getNoun = function (name) {
@@ -166,6 +186,9 @@
 	  for (var x = 0 ; x < this.location.contents.length ; x++) {
 	    nouns.push(this.location.contents[x].name);
 	  }
+	  for (x = 0 ; x < this.inventory.length ; x++) {
+	    nouns.push(this.inventory[x].name);
+	  }
 	  for (x = 0 ; x < this.location.verbs.length ; x++) {
 	    verbs.push(this.location.verbs[x]);
 	  }
@@ -195,6 +218,8 @@
 	    this.display("");
 	    if (this.location.getNoun(noun)) {
 	      noun = this.location.getNoun(noun);
+	    } else if (this.getInventoryNoun(noun)) {
+	      noun = this.getInventoryNoun(noun);
 	    } else {
 	      this.display("Unknown <n>noun</n>");
 	    }
@@ -214,6 +239,15 @@
 	      this.display("You can't do that <v>verb</v> to that <n>noun</n>. Try " + verbs);
 	    }
 	  }
+	};
+	
+	Player.prototype.getInventoryNoun = function (name) {
+	  for (var x = 0 ; x < this.inventory.length ; x++) {
+	    if (this.inventory[x].name === name) {
+	      return this.inventory[x];
+	    }
+	  }
+	  return false;
 	};
 	
 	Player.prototype.display = function (text) {
@@ -284,7 +318,7 @@
 	var worldMap = {};
 	
 	worldMap.backroom = __webpack_require__(7);
-	worldMap.studio = __webpack_require__(8);
+	worldMap.studio = __webpack_require__(9);
 	
 	module.exports = worldMap;
 
@@ -300,6 +334,7 @@
 	  this.locked = args.locked;
 	  this.lockCheck = args.lockCheck;
 	  this.keyName = args.keyName;
+	  this.verbs = args.verbs;
 	  this.description = args.description;
 	};
 	
@@ -348,14 +383,12 @@
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(6);
-	var Item = __webpack_require__(9);
+	var Item = __webpack_require__(8);
 	var Exit = __webpack_require__(5);
 	
 	area = new Area ({
 	  description: "A cramped back room in an artist's studio. Some pipes line the far wall.",
 	  name: 'backroom',
-	  nouns: ['small key', 'door', 'magazine'],
-	  verbs: ['@', 'check', 'go to', 'get'],
 	  worldMap: this,
 	  contents: [
 	    new Exit ({
@@ -365,7 +398,8 @@
 	      destinationName: 'studio',
 	      verbs: ["check", "go to"],
 	    }),
-	    new Feature ({
+	
+	    new Item ({
 	      name: "magazine",
 	      checkText: "It looks like an old science fiction <n>magazine</n>, but you can't read the language.",
 	      description: "On a low table in the corner is a <n>magazine</n>. You can <v>check</v> something to get a description of it (i.e., \"<v>check</v> <n>magazine</n>\").",
@@ -377,6 +411,9 @@
 	      checkText: "An old key ring with one <n>small key</n> on it. If you want to take it with you you can <v>get</v> it.",
 	      description: "There is a <n>small key</n> on the floor.",
 	      verbs: ["check", "get"],
+	      onGet: function () {
+	        this.checkText = "An old key ring with one <n>small key</n> on it.";
+	      },
 	    }),
 	
 	  ],
@@ -387,6 +424,58 @@
 
 /***/ },
 /* 8 */
+/***/ function(module, exports) {
+
+	Item = function (args) {
+	  this.checkText = args.checkText;
+	  this.name = args.name;
+	  this.verbs = args.verbs;
+	  this.description = args.description;
+	  this.onGet = args.onGet;
+	};
+	
+	Item.prototype["check"] = function (noun, player) {
+	  player.display(noun.checkText);
+	};
+	
+	Item.prototype["use"] = function (noun, player) {
+	  player.display(noun.checkText);
+	  console.log("Used item.");
+	};
+	
+	Item.prototype["get"] = function (noun, player) {
+	  if (!player.inventory.includes(noun)) {
+	    var message = (noun.name + "</n>" + " added to your inventory.");
+	    var firstLetter = message.slice(0, 1);
+	    message = message.slice(1, message.length);
+	    message = '<n>' + firstLetter.toUpperCase() + message;
+	    player.inventory.push(noun);
+	    player.display(message);
+	    player.updateInventory();
+	    for (var x = 0; x < player.location.contents.length; x++) {
+	      if (player.location.contents[x].name === noun.name) {
+	        player.location.contents.splice(x, 1);
+	        x--;
+	      }
+	    }
+	    if (noun.onGet) {
+	      noun.onGet();
+	    }
+	    player.book.readArea(player.location);
+	  } else {
+	    player.display("You already have that.");
+	  }
+	};
+	
+	Item.prototype["@"] = function (noun, player) {
+	  Item.prototype["use"](noun, player);
+	};
+	
+	module.exports = Item;
+
+
+/***/ },
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
@@ -396,8 +485,6 @@
 	var area = new Area ({
 	  description: "A painter's studio. Overhead a ceiling fan drifts in steady circles.",
 	  name: 'studio',
-	  nouns: ['door', 'painting', 'window', 'empty canvas', 'locked door'],
-	  verbs: ['@', 'check', 'go to'],
 	  worldMap: this,
 	  contents: [
 	
@@ -444,50 +531,6 @@
 	});
 	
 	module.exports = area;
-
-
-/***/ },
-/* 9 */
-/***/ function(module, exports) {
-
-	Item = function (args) {
-	  this.checkText = args.checkText;
-	  this.name = args.name;
-	  this.verbs = args.verbs;
-	  this.description = args.description;
-	};
-	
-	Item.prototype["check"] = function (noun, player) {
-	  player.display(noun.checkText);
-	};
-	
-	Item.prototype["use"] = function (noun, player) {
-	  player.display(noun.checkText);
-	  console.log("Used item.");
-	};
-	
-	Item.prototype["get"] = function (noun, player) {
-	  var message = (noun.name + " added to your inventory.");
-	  var firstLetter = message.slice(0, 1);
-	  message = message.slice(1, message.length);
-	  message = firstLetter.toUpperCase()+message;
-	  player.inventory.push(noun);
-	  player.display(message);
-	  player.updateInventory();
-	  for (var x = 0; x < player.location.contents.length; x++) {
-	    if (player.location.contents[x].name === noun.name) {
-	      player.location.contents.splice(x, 1);
-	      x--;
-	    }
-	  }
-	  player.book.readArea(player.location);
-	};
-	
-	Item.prototype["@"] = function (noun, player) {
-	  Item.prototype["use"](noun, player);
-	};
-	
-	module.exports = Item;
 
 
 /***/ }

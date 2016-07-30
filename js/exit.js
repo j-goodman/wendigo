@@ -5,6 +5,7 @@ Exit = function (args) {
   this.locked = args.locked;
   this.lockCheck = args.lockCheck;
   this.keyName = args.keyName;
+  this.verbs = args.verbs;
   this.description = args.description;
 };
 
