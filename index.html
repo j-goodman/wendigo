@@ -1,10 +1,10 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <meta content='text/html;charset=utf-8' http-equiv='Content-Type'>
     <meta content='utf-8' http-equiv='encoding'>
     <title>The Wendigo</title>
-    <script src='js/bundle.js' charset='utf-8'></script>
+    <script src='js/wendigo.js' charset='utf-8'></script>
   </head>
   <body>
     <section class='container'>
@@ -15,7 +15,7 @@
       </section>
       <section class='sidebar'>
         <ul class='inventory' id='inventory'></ul>
-        <ul class='inventory' id='inventory'></ul>
+        <ul class='highlighter' id='highlighter'></ul>
       </section>
     </section>
   </body>
@@ -23,8 +23,7 @@
 
 <style media='screen'>
   h1, body, p, input {
-    font-family: monospace;
-    font-family: American Typewriter;
+    font-family: American Typewriter, monospace;
     color: #fe8;
     border: inherit;
     width: inherit;
@@ -73,7 +72,7 @@
     width: 200px;
   }
 
-  .input, .area-window, .player-window, .inventory {
+  .input, .area-window, .player-window, .inventory, .highlighter, .off {
     border: 1px solid #c90;
     border-radius: 4px;
     margin-top: 4px;
@@ -87,6 +86,28 @@
     padding-top: 12px;
     text-align: left;
     width: 120px;
+  }
+
+  .highlighter, .off {
+    background: #000;
+    height: 20px;
+    padding-top: 12px;
+    text-align: left;
+    width: 120px;
+  }
+
+  .highlighter:hover {
+    background: #321;
+    cursor: pointer;
+  }
+
+  .off {
+    background: #321;
+    cursor: pointer;
+  }
+
+  .off:hover {
+    background: #000;
   }
 
   .area-window, .player-window {
