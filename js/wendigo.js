@@ -346,6 +346,7 @@
 	worldMap.backroom = __webpack_require__(7);
 	worldMap.studio = __webpack_require__(9);
 	worldMap.farmhouse = __webpack_require__(10);
+	worldMap.wheatfield = __webpack_require__(12);
 	
 	module.exports = worldMap;
 
@@ -582,14 +583,32 @@
 	var Exit = __webpack_require__(5);
 	
 	area = new Area ({
-	  description: "A single-room building, about ten yards wide in either direction, with walls made from cinder blocks and roughly applied concrete.",
+	  description: "A single-room building, about ten yards wide in either direction,",
 	  name: 'farmhouse',
 	  worldMap: this,
 	  contents: [
 	    new Feature ({
+	      name: "walls",
+	      description: "with walls made from cinder blocks and roughly applied concrete.",
+	      checkText: "The blocks in the walls look like they were stacked by hand. They were built with a north window and a south window.",
+	      verbs: ["check"],
+	    }),
+	    new Feature ({
 	      name: "floor",
 	      description: "The floor is lined by oak planks made grey with a thin coating of ash.",
 	      checkText: "The ash on the floor is soft and feels as if it's still warm. The planks are in disrepair and have large cracks between them and splinters on their upward faces.",
+	      verbs: ["check"],
+	    }),
+	    new Feature ({
+	      name: "north window",
+	      description: "",
+	      checkText: "The view beyond the window is blocked by a large sliding shutter made from the same wood as the tables. There is no sunlight coming through, but you can hear the rattle of the cicadas from outside.",
+	      verbs: ["check"],
+	    }),
+	    new Feature ({
+	      name: "south window",
+	      description: "",
+	      checkText: "The view beyond the window is blocked by a large sliding shutter made from the same wood as the tables. You can smell something burning outside.",
 	      verbs: ["check"],
 	    }),
 	    new Feature ({
@@ -604,14 +623,14 @@
 	    }),
 	    new Feature ({
 	      name: "other table",
-	      description: "Nearby there is an other table, very similar to the first",
+	      description: "Nearby there is an other table, the same as the first",
 	      checkText: "Like its twin, this one is made of a cool, light, smooth wood. There is a dead man lying face-up on top of it.",
 	      verbs: ["check"],
 	    }),
 	    new Feature ({
 	      name: "dead man",
 	      description: "A dead man is lying on top of it.",
-	      checkText: "The dead man looks like he's in is mid-forties, healthy aside from being dead. His eyes are open, looking up a the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
+	      checkText: "The dead man looks like he's in is mid-forties, healthy aside from being dead. His eyes are open, looking up at the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
 	      verbs: ["check"],
 	    }),
 	    new Box ({
@@ -653,6 +672,17 @@
 	      description: "On the wall next to you is a green door.",
 	      destinationName: 'wheatfield',
 	      verbs: ["check", "go to"],
+	    }),
+	
+	    new Item ({
+	      name: "sword",
+	      checkText: "A sword. You can get it if you want it.",
+	      description: "There is a sword leaning next to it.",
+	      verbs: ["check", "get"],
+	
+	      onGet: function () {
+	        this.checkText = "A sword.";
+	      },
 	    }),
 	  ],
 	});
@@ -708,6 +738,34 @@
 	};
 	
 	module.exports = Box;
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Area = __webpack_require__(1);
+	var Feature = __webpack_require__(6);
+	var Box = __webpack_require__(11);
+	var Item = __webpack_require__(8);
+	var Exit = __webpack_require__(5);
+	
+	area = new Area ({
+	  description: "A large barren courtyard, walled in by high-piled stones.",
+	  name: 'wheatfield',
+	  worldMap: this,
+	  contents: [
+	    new Exit ({
+	      name: "door",
+	      description: "The door back in to the farmhouse is behind you.",
+	      checkText: "A green door.",
+	      destinationName: 'farmhouse',
+	      verbs: ["check", "go to"],
+	    }),
+	  ],
+	});
+	
+	module.exports = area;
 
 
 /***/ }

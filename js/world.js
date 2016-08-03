@@ -7,5 +7,6 @@ var worldMap = {};
 worldMap.backroom = require('./areas/backroom.js');
 worldMap.studio = require('./areas/studio.js');
 worldMap.farmhouse = require('./areas/farmhouse.js');
+worldMap.wheatfield = require('./areas/wheatfield.js');
 
 module.exports = worldMap;
