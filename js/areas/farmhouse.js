@@ -73,7 +73,7 @@ area = new Area ({
         }),
         new Item ({
           name: "dollar bill",
-          checkText: "A one dollar bill. If you want to take it with you, you can get it.",
+          checkText: "A one dollar bill.",
           description: "a dollar bill",
           verbs: ["check", "get"],
         }),

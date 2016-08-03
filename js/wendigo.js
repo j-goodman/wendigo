@@ -652,7 +652,7 @@
 	        }),
 	        new Item ({
 	          name: "dollar bill",
-	          checkText: "A one dollar bill. If you want to take it with you, you can get it.",
+	          checkText: "A one dollar bill.",
 	          description: "a dollar bill",
 	          verbs: ["check", "get"],
 	        }),
@@ -747,26 +747,107 @@
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(6);
+	var Fighter = __webpack_require__(13);
 	var Box = __webpack_require__(11);
 	var Item = __webpack_require__(8);
 	var Exit = __webpack_require__(5);
 	
+	var kinnuke = __webpack_require__(14);
+	
 	area = new Area ({
-	  description: "A large barren courtyard, walled in by high-piled stones.",
+	  description: "A large barren courtyard,",
 	  name: 'wheatfield',
 	  worldMap: this,
 	  contents: [
+	    new Feature ({
+	      name: "wall",
+	      description: "walled in by high-piled stones that shield it from the night wind.",
+	      checkText: "The high barrier creates a square courtyard with the east wall of the farmhouse as its fourth side. It looks older than the building beside it, made of porous stone flecked with pieces of seashells.",
+	      verbs: ["check"],
+	    }),
 	    new Exit ({
 	      name: "door",
 	      description: "The door back in to the farmhouse is behind you.",
-	      checkText: "A green door.",
+	      checkText: "A green door. You can use it to go to the farmhouse interior again.",
 	      destinationName: 'farmhouse',
 	      verbs: ["check", "go to"],
 	    }),
+	
+	    // kinnuke
+	
 	  ],
 	});
 	
 	module.exports = area;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports) {
+
+	Fighter = function (args) {
+	  this.checkText = args.checkText;
+	  this.name = args.name;
+	  this.verbs = args.verbs;
+	  this.description = args.description;
+	  this.stats = args.stats;
+	  this.move = args.moves;
+	};
+	
+	Fighter.prototype["check"] = function (noun, player) {
+	  player.display(noun.checkText);
+	  if (this.onCheck) {
+	    this.onCheck();
+	  }
+	};
+	
+	Fighter.prototype["@"] = function (noun, player) {
+	  this["check"]();
+	};
+	
+	module.exports = Fighter;
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Fighter = __webpack_require__(13);
+	
+	var fighter = new Fighter ({
+	  name: "Kinnuke",
+	  description: "A large man, Kinnuke, stands facing you, holding a sword.",
+	  checkText: "A tall man in a long coat holding a sword.",
+	  verbs: ["check", "fight"],
+	  stats: {
+	    hitpoints: 100,
+	    defense: {
+	      cut: 2,
+	      stab: 1,
+	      crush: 3,
+	      blast: 0,
+	    },
+	    speed: 3, // out of 10
+	  },
+	  moves: {
+	    'cross cut': {
+	      attack: {
+	        cut: 14,
+	        stab: 0,
+	        crush: 6,
+	        blast: 0,
+	      },
+	      defense: {
+	        cut: 4,
+	        stab: 7,
+	        crush: 2,
+	        blast: 0,
+	      },
+	    },
+	  },
+	});
+	
+	module.exports = fighter;
 
 
 /***/ }
