@@ -418,9 +418,9 @@
 	var Exit = __webpack_require__(5);
 	
 	area = new Area ({
+	  worldMap: this,
 	  description: "A cramped back room in an artist's studio. Some pipes line the far wall.",
 	  name: 'backroom',
-	  worldMap: this,
 	  contents: [
 	    new Exit ({
 	      name: "door",
@@ -519,12 +519,13 @@
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(6);
+	var Item = __webpack_require__(8);
 	var Exit = __webpack_require__(5);
 	
 	var area = new Area ({
+	  worldMap: this,
 	  description: "A painter's studio. Overhead a ceiling fan drifts in steady circles.",
 	  name: 'studio',
-	  worldMap: this,
 	  contents: [
 	
 	    new Feature ({
@@ -623,14 +624,14 @@
 	    }),
 	    new Feature ({
 	      name: "other table",
-	      description: "Nearby there is an other table, the same as the first",
+	      description: "Nearby there is another table, the same as the first.",
 	      checkText: "Like its twin, this one is made of a cool, light, smooth wood. There is a dead man lying face-up on top of it.",
 	      verbs: ["check"],
 	    }),
 	    new Feature ({
 	      name: "dead man",
 	      description: "A dead man is lying on top of it.",
-	      checkText: "The dead man looks like he's in is mid-forties, healthy aside from being dead. His eyes are open, looking up at the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
+	      checkText: "The dead man looks like he's in his mid-forties, healthy aside from being dead. His eyes are open, looking up at the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
 	      verbs: ["check"],
 	    }),
 	    new Box ({
@@ -677,7 +678,7 @@
 	    new Item ({
 	      name: "sword",
 	      checkText: "A sword. You can get it if you want it.",
-	      description: "There is a sword leaning next to it.",
+	      description: "There is a sword leaning beside it.",
 	      verbs: ["check", "get"],
 	
 	      onGet: function () {
