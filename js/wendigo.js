@@ -757,7 +757,7 @@
 	      verbs: ["check", "get"],
 	
 	      onGet: function () {
-	        this.checkText = "A sword.";
+	        this.checkText = "A sword. Use it to defend yourself, or to <v>attack</v>.";
 	      },
 	    }),
 	  ],
