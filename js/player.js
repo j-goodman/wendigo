@@ -1,6 +1,8 @@
 Player = function (args) {
   this.book = args.book;
   this.location = args.worldMap[args.spawnpoint];
+  this.moves = args.moves;
+  this.hitpoints = args.hitpoints;
   this.inventory = [];
   this.highlightOff = false;
 };
@@ -65,6 +67,46 @@ Player.prototype.executeCommand = function (verb, noun) {
       this.display("You can't do that <v>verb</v> to that <n>noun</n>. Try " + verbs);
     }
   }
+
+  Player.prototype.startFight = function (target) {
+    var move = this.chooseMove();
+    this.attack(target, move);
+  };
+
+  Player.prototype.getMove = function (attacker, attackerMove) {
+    var move = this.moves[0];
+
+    this.attack(attacker, move);
+
+    // The player will choose from their list of moves, sometimes getting hints
+    // about their attacker's moves, if they are perceptive (stat).
+  };
+
+  Player.prototype.attack = function (target, move) {
+    target.isAttacked(this, move);
+  };
+
+  Player.prototype.isAttacked = function (opponent, move) {
+    var response = this.chooseMove(move);
+    // The Player can either engage or flee.
+    this.engage(opponent, move, response);
+    opponent.engage(this, response, move);
+  };
+
+  Player.prototype.engage = function (opponent, move, response) {
+    console.log("Engaged");
+    var damage = 0;
+    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
+
+    damageTypes.forEach(function (type) {
+      damage += (move.attack[type] - response.defense[type]) < 0 ?
+      0 : (move.attack[type] - response.defense[type]);
+    });
+
+    console.log(this.hitpoints);
+    this.hitpoints -= damage;
+    console.log(this.hitpoints);
+  };
 };
 
 Player.prototype.getInventoryNoun = function (name) {

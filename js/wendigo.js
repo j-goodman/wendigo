@@ -64,6 +64,39 @@
 	      inventory: 'inventory',
 	      highlighter: 'highlighter',
 	    }),
+	    moves: [
+	      {
+	        name: 'forward thrust',
+	        attack: {
+	          cut: 2,
+	          stab: 14,
+	          crush: 4,
+	          blast: 0,
+	        },
+	        defense: {
+	          cut: 8,
+	          stab: 2,
+	          crush: 3,
+	          blast: 0,
+	        },
+	      },
+	      {
+	        name: 'cross cut',
+	        attack: {
+	          cut: 14,
+	          stab: 0,
+	          crush: 6,
+	          blast: 0,
+	        },
+	        defense: {
+	          cut: 4,
+	          stab: 7,
+	          crush: 2,
+	          blast: 0,
+	        },
+	      },
+	    ],
+	    hitpoints: 100,
 	    spawnpoint: 'farmhouse',
 	    worldMap: game.worldMap,
 	  });
@@ -202,6 +235,8 @@
 	Player = function (args) {
 	  this.book = args.book;
 	  this.location = args.worldMap[args.spawnpoint];
+	  this.moves = args.moves;
+	  this.hitpoints = args.hitpoints;
 	  this.inventory = [];
 	  this.highlightOff = false;
 	};
@@ -266,6 +301,46 @@
 	      this.display("You can't do that <v>verb</v> to that <n>noun</n>. Try " + verbs);
 	    }
 	  }
+	
+	  Player.prototype.startFight = function (target) {
+	    var move = this.chooseMove();
+	    this.attack(target, move);
+	  };
+	
+	  Player.prototype.getMove = function (attacker, attackerMove) {
+	    var move = this.moves[0];
+	
+	    this.attack(attacker, move);
+	
+	    // The player will choose from their list of moves, sometimes getting hints
+	    // about their attacker's moves, if they are perceptive (stat).
+	  };
+	
+	  Player.prototype.attack = function (target, move) {
+	    target.isAttacked(this, move);
+	  };
+	
+	  Player.prototype.isAttacked = function (opponent, move) {
+	    var response = this.chooseMove(move);
+	    // The Player can either engage or flee.
+	    this.engage(opponent, move, response);
+	    opponent.engage(this, response, move);
+	  };
+	
+	  Player.prototype.engage = function (opponent, move, response) {
+	    console.log("Engaged");
+	    var damage = 0;
+	    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
+	
+	    damageTypes.forEach(function (type) {
+	      damage += (move.attack[type] - response.defense[type]) < 0 ?
+	      0 : (move.attack[type] - response.defense[type]);
+	    });
+	
+	    console.log(this.hitpoints);
+	    this.hitpoints -= damage;
+	    console.log(this.hitpoints);
+	  };
 	};
 	
 	Player.prototype.getInventoryNoun = function (name) {
@@ -762,7 +837,7 @@
 	    new Feature ({
 	      name: "wall",
 	      description: "walled in by high-piled stones that shield it from the night wind.",
-	      checkText: "The high barrier creates a square courtyard with the east wall of the farmhouse as its fourth side. It looks older than the building beside it, made of porous stone flecked with pieces of seashells.",
+	      checkText: "The high barrier creates a square courtyard with the east wall of the farmhouse as its fourth side. It looks older than the building beside it, made of porous stone flecked with pieces of shells.",
 	      verbs: ["check"],
 	    }),
 	    new Exit ({
@@ -773,7 +848,7 @@
 	      verbs: ["check", "go to"],
 	    }),
 	
-	    // kinnuke
+	    kinnuke
 	
 	  ],
 	});
@@ -785,13 +860,14 @@
 /* 13 */
 /***/ function(module, exports) {
 
+	/*jshint sub:true*/
 	Fighter = function (args) {
 	  this.checkText = args.checkText;
 	  this.name = args.name;
 	  this.verbs = args.verbs;
 	  this.description = args.description;
-	  this.stats = args.stats;
-	  this.move = args.moves;
+	  this.hitpoints = args.hitpoints;
+	  this.moves = args.moves;
 	};
 	
 	Fighter.prototype["check"] = function (noun, player) {
@@ -801,8 +877,37 @@
 	  }
 	};
 	
-	Fighter.prototype["@"] = function (noun, player) {
-	  this["check"]();
+	Fighter.prototype["attack"] = function (noun, player) {
+	  player.getMove(noun);
+	};
+	
+	Fighter.prototype.startFight = function (target) {
+	  var move = this.chooseMove();
+	  target.isAttacked(this, move);
+	};
+	
+	Fighter.prototype.chooseMove = function (attackerMove) {
+	  return this.moves[0];
+	  // Move decision logic will be based on data in the Fighter's memory object
+	  // about what has been most effective in the past.
+	};
+	
+	Fighter.prototype.isAttacked = function (opponent, move) {
+	  var response = this.chooseMove(move);
+	  // The Fighter will sometimes flee, otherwise they attack
+	  this.engage(opponent, move, response);
+	  opponent.engage(this, response, move);
+	};
+	
+	Fighter.prototype.engage = function (opponent, move, response) {
+	  var damage = 0;
+	  var damageTypes = ['cut', 'stab', 'crush', 'blast'];
+	
+	  damageTypes.forEach(function (type) {
+	    damage += (move.attack[type] - response.defense[type]) < 0 ?
+	    0 : (move.attack[type] - response.defense[type]);
+	  });
+	  this.hitpoints -= damage;
 	};
 	
 	module.exports = Fighter;
@@ -815,22 +920,14 @@
 	var Fighter = __webpack_require__(13);
 	
 	var fighter = new Fighter ({
-	  name: "Kinnuke",
-	  description: "A large man, Kinnuke, stands facing you, holding a sword.",
-	  checkText: "A tall man in a long coat holding a sword.",
-	  verbs: ["check", "fight"],
-	  stats: {
-	    hitpoints: 100,
-	    defense: {
-	      cut: 2,
-	      stab: 1,
-	      crush: 3,
-	      blast: 0,
-	    },
-	    speed: 3, // out of 10
-	  },
-	  moves: {
-	    'cross cut': {
+	  name: "old man",
+	  description: "An old man stands facing you, holding a sword.",
+	  checkText: "A tall whitehaired man in a long coat holding a sword.",
+	  verbs: ["check", "attack"],
+	  hitpoints: 100,
+	  moves: [
+	    {
+	      name: 'cross cut',
 	      attack: {
 	        cut: 14,
 	        stab: 0,
@@ -844,7 +941,7 @@
 	        blast: 0,
 	      },
 	    },
-	  },
+	  ],
 	});
 	
 	module.exports = fighter;

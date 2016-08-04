@@ -15,7 +15,7 @@ area = new Area ({
     new Feature ({
       name: "wall",
       description: "walled in by high-piled stones that shield it from the night wind.",
-      checkText: "The high barrier creates a square courtyard with the east wall of the farmhouse as its fourth side. It looks older than the building beside it, made of porous stone flecked with pieces of seashells.",
+      checkText: "The high barrier creates a square courtyard with the east wall of the farmhouse as its fourth side. It looks older than the building beside it, made of porous stone flecked with pieces of shells.",
       verbs: ["check"],
     }),
     new Exit ({
@@ -26,7 +26,7 @@ area = new Area ({
       verbs: ["check", "go to"],
     }),
 
-    // kinnuke
+    kinnuke
 
   ],
 });
