@@ -3,7 +3,7 @@ var Fighter = require('../fighter.js');
 var fighter = new Fighter ({
   name: "old man",
   description: "An old man stands facing you, holding a sword.",
-  checkText: "A tall whitehaired man in a long coat holding a sword.",
+  checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
   verbs: ["check", "attack"],
   hitpoints: 100,
   moves: [

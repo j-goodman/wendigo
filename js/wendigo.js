@@ -827,7 +827,7 @@
 	var Item = __webpack_require__(8);
 	var Exit = __webpack_require__(5);
 	
-	var kinnuke = __webpack_require__(14);
+	var kannuki = __webpack_require__(14);
 	
 	area = new Area ({
 	  description: "A large barren courtyard,",
@@ -848,7 +848,7 @@
 	      verbs: ["check", "go to"],
 	    }),
 	
-	    kinnuke
+	    kannuki
 	
 	  ],
 	});
@@ -922,7 +922,7 @@
 	var fighter = new Fighter ({
 	  name: "old man",
 	  description: "An old man stands facing you, holding a sword.",
-	  checkText: "A tall whitehaired man in a long coat holding a sword.",
+	  checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
 	  verbs: ["check", "attack"],
 	  hitpoints: 100,
 	  moves: [
