@@ -1,4 +1,5 @@
 Player = function (args) {
+  this.name = args.name;
   this.book = args.book;
   this.location = args.worldMap[args.spawnpoint];
   this.moves = args.moves;
@@ -95,6 +96,8 @@ Player.prototype.executeCommand = function (verb, noun) {
 
   Player.prototype.engage = function (opponent, move, response) {
     console.log("Engaged");
+    console.log(this.book.describeFight);
+    this.book.describeFight(this, opponent);
     var damage = 0;
     var damageTypes = ['cut', 'stab', 'crush', 'blast'];
 

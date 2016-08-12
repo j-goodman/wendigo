@@ -64,6 +64,7 @@
 	      inventory: 'inventory',
 	      highlighter: 'highlighter',
 	    }),
+	    name: 'Enoki',
 	    moves: [
 	      {
 	        name: 'forward thrust',
@@ -182,6 +183,7 @@
 	  this.inventory = document.getElementById(args.inventory);
 	  this.highlighter = document.getElementById(args.highlighter);
 	  this.player = args.player;
+	  this.fightScreen = false;
 	};
 	
 	Book.prototype.init = function () {
@@ -225,6 +227,51 @@
 	  this.areaWindow.innerHTML = description;
 	};
 	
+	Book.prototype.scrollDown = function (scrollDelta, diff) {
+	  if (!diff) { diff = 1; }
+	  var y = window.pageYOffset;
+	  window.scrollTo(0, y+diff);
+	  diff += 0.5;
+	  if (diff < scrollDelta) {
+	    window.setTimeout(function () {
+	      this.scrollDown(scrollDelta, diff);
+	    }.bind(this), 10);
+	  }
+	};
+	
+	Book.prototype.describeFight = function (player, opponent) {
+	  console.log("'Describing fight' --Book");
+	  var fight = {
+	    player: player,
+	    opponent: opponent,
+	    playerEnterMove: function (move) {
+	      this.printFightMove(move.name);
+	    }.bind(this),
+	    opponentEnterMove: function (move) {
+	      this.printFightMove(move.name);
+	    }.bind(this),
+	  };
+	  this.playerWindow.className = 'fight-window';
+	  this.scrollDown(13);
+	  console.log(fight.player);
+	  console.log(this.playerWindow.innerHTML);
+	  this.playerWindow.innerHTML = '<ul>';
+	  this.playerWindow.innerHTML += '<li>' + fight.player.name + '</li><li>' + fight.player.moves[0].name + '</li>';
+	  this.playerWindow.innerHTML += '<li>' + fight.opponent.name + '</li>';
+	  this.playerWindow.innerHTML += '<ul>';
+	  console.log("Populated window");
+	  var fightText = fight.player.name + "\n" + "";
+	  this.areaWindow.innerHTML = fightText;
+	};
+	
+	Book.prototype.printFightMove = function (move) {
+	  this.playerWindow.innerHTML += "\n" + move.name;
+	};
+	
+	Book.prototype.endFight = function () {
+	  this.playerWindow.classname = 'player-window';
+	};
+	
 	module.exports = Book;
 
 
@@ -233,6 +280,7 @@
 /***/ function(module, exports) {
 
 	Player = function (args) {
+	  this.name = args.name;
 	  this.book = args.book;
 	  this.location = args.worldMap[args.spawnpoint];
 	  this.moves = args.moves;
@@ -329,6 +377,8 @@
 	
 	  Player.prototype.engage = function (opponent, move, response) {
 	    console.log("Engaged");
+	    console.log(this.book.describeFight);
+	    this.book.describeFight(this, opponent);
 	    var damage = 0;
 	    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
 	
@@ -827,7 +877,7 @@
 	var Item = __webpack_require__(8);
 	var Exit = __webpack_require__(5);
 	
-	var kinnuke = __webpack_require__(14);
+	var kannuki = __webpack_require__(14);
 	
 	area = new Area ({
 	  description: "A large barren courtyard,",
@@ -848,7 +898,7 @@
 	      verbs: ["check", "go to"],
 	    }),
 	
-	    kinnuke
+	    kannuki
 	
 	  ],
 	});

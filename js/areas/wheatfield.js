@@ -5,7 +5,7 @@ var Box = require('../box.js');
 var Item = require('../item.js');
 var Exit = require('../exit.js');
 
-var kinnuke = require('../fighters/kinnuke');
+var kannuki = require('../fighters/kannuki');
 
 area = new Area ({
   description: "A large barren courtyard,",
@@ -26,7 +26,7 @@ area = new Area ({
       verbs: ["check", "go to"],
     }),
 
-    kinnuke
+    kannuki
 
   ],
 });

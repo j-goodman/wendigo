@@ -52,7 +52,7 @@
     border: 1px solid #332;
     display: flex;
     flex-direction: column;
-    height: 740px;
+    height: 760px;
     position: relative;
     top: -16px;
     padding-top: 32px;
@@ -65,14 +65,14 @@
     border: 1px solid #332;
     display: flex;
     flex-direction: column;
-    height: 740px;
+    height: 760px;
     position: relative;
     top: -16px;
     padding-top: 32px;
     width: 200px;
   }
 
-  .input, .area-window, .player-window, .inventory, .highlighter, .off {
+  .input, .area-window, .player-window, .fight-window, .inventory, .highlighter, .off {
     border: 1px solid #c90;
     border-radius: 4px;
     margin-top: 4px;
@@ -105,11 +105,19 @@
     cursor: pointer;
   }
 
-  .area-window, .player-window {
+  .area-window, .player-window, .fight-window {
     background: #000;
     min-height: 226px;
     padding: 18px;
+    transition: min-height .4s;
     width: 386px;
+  }
+
+  .fight-window {
+    list-style: none;
+    min-height: 386px;
+    text-align: center;
+    transition: min-height .4s;
   }
 
   .input {

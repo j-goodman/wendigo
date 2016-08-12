@@ -18,6 +18,7 @@ var init = function () {
       inventory: 'inventory',
       highlighter: 'highlighter',
     }),
+    name: 'Enoki',
     moves: [
       {
         name: 'forward thrust',
