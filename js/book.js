@@ -1,3 +1,5 @@
+var fight_display = require('./html/fight_display.js');
+
 Book = function (args) {
   this.input = document.getElementById(args.inputId);
   this.areaWindow = document.getElementById(args.areaId);
@@ -75,12 +77,13 @@ Book.prototype.describeFight = function (player, opponent) {
   };
   this.playerWindow.className = 'fight-window';
   this.scrollDown(13);
-  console.log(fight.player);
-  console.log(this.playerWindow.innerHTML);
-  this.playerWindow.innerHTML = '<ul>';
-  this.playerWindow.innerHTML += '<li>' + fight.player.name + '</li><li>' + fight.player.moves[0].name + '</li>';
-  this.playerWindow.innerHTML += '<li>' + fight.opponent.name + '</li>';
-  this.playerWindow.innerHTML += '<ul>';
+  this.playerWindow.innerHTML = fight_display.fighter(player);
+  // console.log(fight.player);
+  // console.log(this.playerWindow.innerHTML);
+  // this.playerWindow.innerHTML = '<ul>';
+  // this.playerWindow.innerHTML += '<li>' + fight.player.name + '</li><li>' + fight.player.moves[0].name + '</li>';
+  // this.playerWindow.innerHTML += '<li>' + fight.opponent.name + '</li>';
+  // this.playerWindow.innerHTML += '<ul>';
   console.log("Populated window");
   var fightText = fight.player.name + "\n" + "";
   this.areaWindow.innerHTML = fightText;
