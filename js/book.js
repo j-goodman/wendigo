@@ -8,6 +8,7 @@ Book = function (args) {
   this.highlighter = document.getElementById(args.highlighter);
   this.player = args.player;
   this.fightScreen = false;
+  this.fightDisplay = fight_display;
 };
 
 Book.prototype.init = function () {
@@ -64,7 +65,6 @@ Book.prototype.scrollDown = function (scrollDelta, diff) {
 };
 
 Book.prototype.describeFight = function (player, opponent) {
-  console.log("'Describing fight' --Book");
   var fight = {
     player: player,
     opponent: opponent,
@@ -77,14 +77,14 @@ Book.prototype.describeFight = function (player, opponent) {
   };
   this.playerWindow.className = 'fight-window';
   this.scrollDown(13);
-  this.playerWindow.innerHTML = fight_display.fighter(player);
+  console.log(this.fightDisplay);
+  this.playerWindow.innerHTML = this.fightDisplay.fighter(player);
   // console.log(fight.player);
   // console.log(this.playerWindow.innerHTML);
   // this.playerWindow.innerHTML = '<ul>';
   // this.playerWindow.innerHTML += '<li>' + fight.player.name + '</li><li>' + fight.player.moves[0].name + '</li>';
   // this.playerWindow.innerHTML += '<li>' + fight.opponent.name + '</li>';
   // this.playerWindow.innerHTML += '<ul>';
-  console.log("Populated window");
   var fightText = fight.player.name + "\n" + "";
   this.areaWindow.innerHTML = fightText;
 };
