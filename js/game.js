@@ -20,7 +20,7 @@ var init = function () {
       inventory: 'inventory',
       highlighter: 'highlighter',
     }),
-    name: 'Enoki',
+    name: 'Sanjuro',
     moves: [
       {
         name: 'forward thrust',

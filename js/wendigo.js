@@ -66,7 +66,7 @@
 	      inventory: 'inventory',
 	      highlighter: 'highlighter',
 	    }),
-	    name: 'Enoki',
+	    name: 'Sanjuro',
 	    moves: [
 	      {
 	        name: 'forward thrust',
@@ -259,8 +259,9 @@
 	  };
 	  this.playerWindow.className = 'fight-window';
 	  this.scrollDown(13);
-	  console.log(this.fightDisplay);
-	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player);
+	  console.log("Player move:");
+	  console.log(player.moves[0]);
+	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.moves[0]);
 	  // console.log(fight.player);
 	  // console.log(this.playerWindow.innerHTML);
 	  // this.playerWindow.innerHTML = '<ul>';
@@ -288,7 +289,8 @@
 
 	fight_display = {};
 	fight_display.move = function (move) {
-	  return "  "+
+	  console.log("Preparing move display");
+	  return ""+
 	  "<ul class='move'> "+
 	    "<div class='left-arrow'>◀</div> "+
 	    "<li>"+move.name+"</li>  "+
@@ -329,6 +331,11 @@
 	"  ";
 	};
 	fight_display.fighter = function (fighter, move) {
+	  console.log("Preparing fighter display:");
+	  console.log("  fighter:");
+	  console.log(fighter);
+	  console.log("  move:");
+	  console.log(move);
 	  return "  "+
 	"  "+
 	  "<section class='display'> "+
@@ -344,7 +351,7 @@
 	      "} "+
 	    "} "+
 	  "</style>  "+
-	"  ";
+	"";
 	};
 	
 	module.exports = fight_display;

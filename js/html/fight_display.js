@@ -1,6 +1,7 @@
 fight_display = {};
 fight_display.move = function (move) {
-  return "  "+
+  console.log("Preparing move display");
+  return ""+
   "<ul class='move'> "+
     "<div class='left-arrow'>◀</div> "+
     "<li>"+move.name+"</li>  "+
@@ -41,6 +42,11 @@ fight_display.move = function (move) {
 "  ";
 };
 fight_display.fighter = function (fighter, move) {
+  console.log("Preparing fighter display:");
+  console.log("  fighter:");
+  console.log(fighter);
+  console.log("  move:");
+  console.log(move);
   return "  "+
 "  "+
   "<section class='display'> "+
@@ -56,7 +62,7 @@ fight_display.fighter = function (fighter, move) {
       "} "+
     "} "+
   "</style>  "+
-"  ";
+"";
 };
 
 module.exports = fight_display;
