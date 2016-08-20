@@ -154,6 +154,17 @@ Player.prototype.highlight = function (text) {
   return text;
 };
 
+Player.prototype.hitpointsString = function () {
+  var string = "";
+  for (var x = 0; x < this.hitpoints; x+=3) {
+    string += "█";
+  }
+  if (string.length < this.hitpoints/3) {
+    string += "▌";
+  }
+  return string;
+};
+
 Player.prototype.enterArea = function () {
   this.lookAround();
 };

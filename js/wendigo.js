@@ -292,40 +292,20 @@
 	  console.log("Preparing move display");
 	  return ""+
 	  "<ul class='move'> "+
-	    "<div class='left-arrow'>◀</div> "+
-	    "<li>"+move.name+"</li>  "+
-	    "<br>  "+
+	    "<li>◀  "+move.name+"  ▶</li>"+
 	    "<li>attack</li> "+
-	    "<br>  "+
-	    "<li>"+move.attack.crush+"♣</li> "+
-	    "<li>"+move.attack.cut+"♦</li> "+
-	    "<li>"+move.attack.blast+"♥</li> "+
-	    "<li>"+move.attack.stab+"♠</li>  "+
-	    "<br>  "+
+	    "<li>"+move.attack.crush+"♣ "+move.attack.cut+"♦ "+move.attack.blast+"♥ "+move.attack.stab+"♠"+"</li>"+
 	    "<li>defense</li>  "+
-	    "<br>  "+
-	    "<li>"+move.defense.crush+"♣</li>  "+
-	    "<li>"+move.defense.cut+"♦</li>  "+
-	    "<li>"+move.defense.blast+"♥</li>  "+
-	    "<li>"+move.defense.stab+"♠</li> "+
-	    "<div class='right-arrow'>▶</div>  "+
+	    "<li>"+move.defense.crush+"♣ "+move.defense.cut+"♦ "+move.defense.blast+"♥ "+move.defense.stab+"♠ "+
+	    "<div class='right-arrow'></div>  "+
 	  "</ul> "+
 	"  "+
 	  "<style media='screen'>  "+
 	    ".move { "+
-	      "li {  "+
-	        "text-align: center; "+
-	        "white-space: nowrap;  "+
-	        "width: 100%;  "+
-	      "} "+
-	"      "+
-	      ".left-arrow { "+
-	        "float: left;  "+
-	      "} "+
-	"      "+
-	      ".right-arrow {  "+
-	        "float: right; "+
-	      "} "+
+	      "position: relative; "+
+	      "right: 41px; "+
+	      "text-align: center; "+
+	      "width: 100%;  "+
 	    "} "+
 	  "</style>  "+
 	"  ";
@@ -340,12 +320,14 @@
 	"  "+
 	  "<section class='display'> "+
 	    "<h1>"+fighter.name+"</h1> "+
+	    "<h1>"+fighter.hitpointsString()+"</h1> "+
 	    "<span>"+fight_display.move(move)+"</span> "+
 	  "</section>  "+
 	"  "+
 	  "<style media='screen'>  "+
 	    ".display {  "+
 	      "h1, span {  "+
+	        "margin: auto; "+
 	        "text-align: center; "+
 	        "width: 100% "+
 	      "} "+
@@ -515,6 +497,17 @@
 	    }
 	  }
 	  return text;
+	};
+	
+	Player.prototype.hitpointsString = function () {
+	  var string = "";
+	  for (var x = 0; x < this.hitpoints; x+=3) {
+	    string += "█";
+	  }
+	  if (string.length < this.hitpoints/3) {
+	    string += "▌";
+	  }
+	  return string;
 	};
 	
 	Player.prototype.enterArea = function () {
