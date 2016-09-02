@@ -258,7 +258,8 @@
 	    }.bind(this),
 	  };
 	  this.playerWindow.className = 'fight-window';
-	  this.scrollDown(13);
+	  this.input.blur();
+	  this.scrollDown(14);
 	  console.log("Player move:");
 	  console.log(player.moves[0]);
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.moves[0]);
@@ -292,12 +293,12 @@
 	  console.log("Preparing move display");
 	  return ""+
 	  "<ul class='move'> "+
-	    "<li>◀  "+move.name+"  ▶</li>"+
-	    "<li>attack</li> "+
-	    "<li>"+move.attack.crush+"♣ "+move.attack.cut+"♦ "+move.attack.blast+"♥ "+move.attack.stab+"♠"+"</li>"+
-	    "<li>defense</li>  "+
-	    "<li>"+move.defense.crush+"♣ "+move.defense.cut+"♦ "+move.defense.blast+"♥ "+move.defense.stab+"♠ "+
-	    "<div class='right-arrow'></div>  "+
+	    "<li><span class='move-lefty'>◀</span> "+move.name+" <span class='move-righty'>▶</span></li>"+
+	    "<li class='move-stat'>attack:</li> "+
+	    "<v class='move-stat'>"+move.attack.crush+"♣ "+move.attack.cut+"♦ "+move.attack.blast+"♥ "+move.attack.stab+"♠"+"</v>"+
+	    "<li class='move-stat'>defense:</li>  "+
+	    "<n class='move-stat'>"+move.defense.crush+"♣ "+move.defense.cut+"♦ "+move.defense.blast+"♥ "+move.defense.stab+"♠ "+"</n>"+
+	    "<li class='move-instruction'>[enter]</li>"+
 	  "</ul> "+
 	"  "+
 	  "<style media='screen'>  "+
@@ -320,7 +321,7 @@
 	"  "+
 	  "<section class='display'> "+
 	    "<h1>"+fighter.name+"</h1> "+
-	    "<h1>"+fighter.hitpointsString()+"</h1> "+
+	    "<h1 class='healthbar'>"+fighter.hitpointsString()+"</h1> "+
 	    "<span>"+fight_display.move(move)+"</span> "+
 	  "</section>  "+
 	"  "+
