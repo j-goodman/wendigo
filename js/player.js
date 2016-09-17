@@ -1,6 +1,11 @@
+var Fighter = require('./fighter.js');
+
 Player = function (args) {
+  this.name = args.name;
   this.book = args.book;
   this.location = args.worldMap[args.spawnpoint];
+  this.moves = args.moves;
+  this.hitpoints = args.hitpoints;
   this.inventory = [];
   this.highlightOff = false;
 };
@@ -65,6 +70,46 @@ Player.prototype.executeCommand = function (verb, noun) {
       this.display("You can't do that <v>verb</v> to that <n>noun</n>. Try " + verbs);
     }
   }
+
+  Player.prototype.startFight = function (target) {
+    var move = this.chooseMove();
+    this.attack(target, move);
+  };
+
+  Player.prototype.getMove = function (attacker, attackerMove) {
+    var move = this.moves[0];
+
+    this.attack(attacker, move);
+
+    // The player will choose from their list of moves, sometimes getting hints
+    // about their attacker's moves, if they are perceptive (stat).
+  };
+
+  Player.prototype.attack = function (target, move) {
+    target.isAttacked(this, move);
+  };
+
+  Player.prototype.isAttacked = function (opponent, move) {
+    var response = this.chooseMove(move);
+    // The Player can either engage or flee.
+  };
+
+  Player.prototype.haveFightDescribed = function (opponent, callback) {
+    this.book.describeFight(this, opponent, callback);
+  };
+
+  Player.prototype.engage = function (opponent, move, response) {
+    var damage = 0;
+    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
+
+    damageTypes.forEach(function (type) {
+      damage += (move.attack[type] - response.defense[type]) < 0 ?
+      0 : (move.attack[type] - response.defense[type]);
+    });
+
+    this.hitpoints -= damage;
+    this.book.updateFightDisplay(this, opponent);
+  };
 };
 
 Player.prototype.getInventoryNoun = function (name) {
@@ -89,14 +134,14 @@ Player.prototype.highlight = function (text) {
   for (x = 0 ; x < text.length-1 ; x++) {
     for (var y = 1 ; y < text.length ; y++) {
       var output;
-      if (nouns.includes(text.slice(x, y))) {
+      if (nouns.includes(text.slice(x, y).toLowerCase())) {
         output = text;
         if (text.slice(x-3, x) !== "<n>") {
           output = [text.slice(0, x), "<n>", text.slice(x)].join('');
           output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
         }
         text = output;
-      } else if (verbs.includes(text.slice(x, y))) {
+      } else if (verbs.includes(text.slice(x, y).toLowerCase())) {
         output = text;
         if (text.slice(x-3, x) !== "<v>") {
           output = [text.slice(0, x), "<v>", text.slice(x)].join('');
@@ -108,6 +153,8 @@ Player.prototype.highlight = function (text) {
   }
   return text;
 };
+
+Player.prototype.hitpointsString = Fighter.prototype.hitpointsString;
 
 Player.prototype.enterArea = function () {
   this.lookAround();

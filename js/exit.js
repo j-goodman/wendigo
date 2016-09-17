@@ -6,12 +6,16 @@ Exit = function (args) {
   this.lockCheck = args.lockCheck;
   this.keyName = args.keyName;
   this.verbs = args.verbs;
+  this.onExit = args.onExit;
   this.description = args.description;
 };
 
 Exit.prototype["go to"] = function (noun, player) {
   var worldMap = require("./world.js");
   player.location = worldMap[noun.destinationName];
+  if (this.onExit) {
+    this.onExit();
+  }
   player.enterArea();
 };
 

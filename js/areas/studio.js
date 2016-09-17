@@ -1,11 +1,12 @@
 var Area = require('../area.js');
 var Feature = require('../feature.js');
+var Item = require('../item.js');
 var Exit = require('../exit.js');
 
 var area = new Area ({
+  worldMap: this,
   description: "A painter's studio. Overhead a ceiling fan drifts in steady circles.",
   name: 'studio',
-  worldMap: this,
   contents: [
 
     new Feature ({

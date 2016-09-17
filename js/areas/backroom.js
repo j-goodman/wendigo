@@ -4,9 +4,9 @@ var Item = require('../item.js');
 var Exit = require('../exit.js');
 
 area = new Area ({
+  worldMap: this,
   description: "A cramped back room in an artist's studio. Some pipes line the far wall.",
   name: 'backroom',
-  worldMap: this,
   contents: [
     new Exit ({
       name: "door",

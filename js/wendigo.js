@@ -47,7 +47,7 @@
 	var Area = __webpack_require__(1);
 	var Book = __webpack_require__(2);
 	var Player = __webpack_require__(4);
-	var worldMap = __webpack_require__(5);
+	var worldMap = __webpack_require__(6);
 	
 	window.onload = function () {
 	  init();
@@ -64,6 +64,55 @@
 	      inventory: 'inventory',
 	      highlighter: 'highlighter',
 	    }),
+	    name: 'Sanjuro',
+	    moves: [
+	      {
+	        name: 'forward thrust',
+	        attack: {
+	          cut: 0,
+	          stab: 24,
+	          crush: 0,
+	          blast: 0,
+	        },
+	        defense: {
+	          cut: 12,
+	          stab: 3,
+	          crush: 6,
+	          blast: 0,
+	        },
+	      },
+	      {
+	        name: 'cross cut',
+	        attack: {
+	          cut: 24,
+	          stab: 0,
+	          crush: 0,
+	          blast: 0,
+	        },
+	        defense: {
+	          cut: 12,
+	          stab: 3,
+	          crush: 3,
+	          blast: 0,
+	        },
+	      },
+	      {
+	        name: 'cautious feint',
+	        attack: {
+	          cut: 5,
+	          stab: 5,
+	          crush: 0,
+	          blast: 0,
+	        },
+	        defense: {
+	          cut: 18,
+	          stab: 18,
+	          crush: 0,
+	          blast: 0,
+	        },
+	      },
+	    ],
+	    hitpoints: 100,
 	    spawnpoint: 'farmhouse',
 	    worldMap: game.worldMap,
 	  });
@@ -85,10 +134,10 @@
 	  this.getNouns = function () {
 	    var nouns = [];
 	    for (var x = 0 ; x < this.contents.length ; x++) {
-	      nouns.push(this.contents[x].name);
+	      nouns.push(this.contents[x].name.toLowerCase());
 	      if (this.contents[x].contents) {
 	        for (var z = 0 ; z < this.contents[x].contents.length ; z++) {
-	          nouns.push(this.contents[x].contents[z].name);
+	          nouns.push(this.contents[x].contents[z].name.toLowerCase());
 	        }
 	      }
 	    }
@@ -120,7 +169,7 @@
 	
 	Area.prototype.getNoun = function (name) {
 	  for (var x = 0 ; x < this.contents.length ; x++) {
-	    if (this.contents[x].name === name) {
+	    if (this.contents[x].name.toLowerCase() === name.toLowerCase()) {
 	      return this.contents[x];
 	    }
 	    if (this.contents[x].contents) {
@@ -140,8 +189,10 @@
 
 /***/ },
 /* 2 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
+	var fight_display = __webpack_require__(3);
+	
 	Book = function (args) {
 	  this.input = document.getElementById(args.inputId);
 	  this.areaWindow = document.getElementById(args.areaId);
@@ -149,6 +200,8 @@
 	  this.inventory = document.getElementById(args.inventory);
 	  this.highlighter = document.getElementById(args.highlighter);
 	  this.player = args.player;
+	  this.fightScreen = false;
+	  this.fightDisplay = fight_display;
 	};
 	
 	Book.prototype.init = function () {
@@ -192,17 +245,152 @@
 	  this.areaWindow.innerHTML = description;
 	};
 	
+	Book.prototype.scrollDown = function (scrollDelta, diff) {
+	  if (!diff) { diff = 1; }
+	  var y = window.pageYOffset;
+	  window.scrollTo(0, y+diff);
+	  diff += 0.5;
+	  if (diff < scrollDelta) {
+	    window.setTimeout(function () {
+	      this.scrollDown(scrollDelta, diff);
+	    }.bind(this), 10);
+	  }
+	};
+	
+	Book.prototype.describeFight = function (player, opponent, callback) {
+	  var fight = {
+	    player: player,
+	    opponent: opponent,
+	    playerEnterMove: function (move) {
+	      this.printFightMove(move.name);
+	    }.bind(this),
+	    opponentEnterMove: function (move) {
+	      this.printFightMove(move.name);
+	    }.bind(this),
+	  };
+	  this.playerWindow.className = 'fight-window';
+	  this.input.blur();
+	  this.scrollDown(16);
+	  fight.player.currentMove = {
+	    index: 0,
+	    data: player.moves[0],
+	  };
+	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  this.setUpFightControls(fight, callback);
+	};
+	
+	Book.prototype.setUpFightControls = function (fight, callback) {
+	  var slideLeft; var slideRight; var player;
+	  player = fight.player;
+	  slideLeft = function () {
+	    player.currentMove.index -= 1;
+	    if (player.currentMove.index < 0) {
+	      player.currentMove.index = player.moves.length-1;
+	    }
+	    player.currentMove.data = player.moves[player.currentMove.index];
+	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+	    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  }.bind(this);
+	  slideRight = function () {
+	    player.currentMove.index += 1;
+	    if (player.currentMove.index >= player.moves.length) {
+	      player.currentMove.index = 0;
+	    }
+	    player.currentMove.data = player.moves[player.currentMove.index];
+	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+	    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  }.bind(this);
+	  window.onkeydown = function (event) {
+	    if (event.key == 'ArrowLeft') {
+	      slideLeft();
+	    }
+	    if (event.key == 'ArrowRight') {
+	      slideRight();
+	    }
+	    if (event.key == ' ') {
+	      callback();
+	    }
+	  };
+	};
+	
+	Book.prototype.updateFightDisplay = function (player, opponent) {
+	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
+	};
+	
+	Book.prototype.printFightMove = function (move) {
+	  this.playerWindow.innerHTML += "\n" + move.name;
+	};
+	
+	Book.prototype.endFight = function () {
+	  this.playerWindow.classname = 'player-window';
+	};
+	
 	module.exports = Book;
 
 
 /***/ },
-/* 3 */,
-/* 4 */
+/* 3 */
 /***/ function(module, exports) {
 
+	fight_display = {};
+	fight_display.move = function (move) {
+	  return ""+
+	  "<ul class='move'> "+
+	    "<li><span class='move-lefty'>◀</span> "+move.name+" <span class='move-righty'>▶</span></li>"+
+	    "<li class='move-stat'>attack:</li> "+
+	    "<v class='move-stat'>"+move.attack.crush+"♣ "+move.attack.cut+"♦ "+move.attack.blast+"♥ "+move.attack.stab+"♠"+"</v>"+
+	    "<li class='move-stat'>defense:</li>  "+
+	    "<n class='move-stat'>"+move.defense.crush+"♣ "+move.defense.cut+"♦ "+move.defense.blast+"♥ "+move.defense.stab+"♠ "+"</n>"+
+	  "</ul> "+
+	"  "+
+	  "<style media='screen'>  "+
+	    ".move { "+
+	      "position: relative; "+
+	      "right: 41px; "+
+	      "text-align: center; "+
+	      "width: 100%;  "+
+	    "} "+
+	  "</style>  "+
+	"  ";
+	};
+	fight_display.fighter = function (fighter, move) {
+	  return "  "+
+	"  "+
+	  "<section class='display'> "+
+	    "<h1>"+fighter.name+"</h1> "+
+	    "<h1 class='healthbar'>"+fighter.hitpointsString()+"</h1> "+
+	    "<span>"+fight_display.move(move)+"</span> "+
+	  "</section>  "+
+	"  "+
+	  "<style media='screen'>  "+
+	    ".display {  "+
+	      "h1, span {  "+
+	        "margin: auto; "+
+	        "text-align: center; "+
+	        "width: 100% "+
+	      "} "+
+	    "} "+
+	  "</style>  "+
+	"";
+	};
+	
+	module.exports = fight_display;
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Fighter = __webpack_require__(5);
+	
 	Player = function (args) {
+	  this.name = args.name;
 	  this.book = args.book;
 	  this.location = args.worldMap[args.spawnpoint];
+	  this.moves = args.moves;
+	  this.hitpoints = args.hitpoints;
 	  this.inventory = [];
 	  this.highlightOff = false;
 	};
@@ -267,6 +455,46 @@
 	      this.display("You can't do that <v>verb</v> to that <n>noun</n>. Try " + verbs);
 	    }
 	  }
+	
+	  Player.prototype.startFight = function (target) {
+	    var move = this.chooseMove();
+	    this.attack(target, move);
+	  };
+	
+	  Player.prototype.getMove = function (attacker, attackerMove) {
+	    var move = this.moves[0];
+	
+	    this.attack(attacker, move);
+	
+	    // The player will choose from their list of moves, sometimes getting hints
+	    // about their attacker's moves, if they are perceptive (stat).
+	  };
+	
+	  Player.prototype.attack = function (target, move) {
+	    target.isAttacked(this, move);
+	  };
+	
+	  Player.prototype.isAttacked = function (opponent, move) {
+	    var response = this.chooseMove(move);
+	    // The Player can either engage or flee.
+	  };
+	
+	  Player.prototype.haveFightDescribed = function (opponent, callback) {
+	    this.book.describeFight(this, opponent, callback);
+	  };
+	
+	  Player.prototype.engage = function (opponent, move, response) {
+	    var damage = 0;
+	    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
+	
+	    damageTypes.forEach(function (type) {
+	      damage += (move.attack[type] - response.defense[type]) < 0 ?
+	      0 : (move.attack[type] - response.defense[type]);
+	    });
+	
+	    this.hitpoints -= damage;
+	    this.book.updateFightDisplay(this, opponent);
+	  };
 	};
 	
 	Player.prototype.getInventoryNoun = function (name) {
@@ -291,14 +519,14 @@
 	  for (x = 0 ; x < text.length-1 ; x++) {
 	    for (var y = 1 ; y < text.length ; y++) {
 	      var output;
-	      if (nouns.includes(text.slice(x, y))) {
+	      if (nouns.includes(text.slice(x, y).toLowerCase())) {
 	        output = text;
 	        if (text.slice(x-3, x) !== "<n>") {
 	          output = [text.slice(0, x), "<n>", text.slice(x)].join('');
 	          output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
 	        }
 	        text = output;
-	      } else if (verbs.includes(text.slice(x, y))) {
+	      } else if (verbs.includes(text.slice(x, y).toLowerCase())) {
 	        output = text;
 	        if (text.slice(x-3, x) !== "<v>") {
 	          output = [text.slice(0, x), "<v>", text.slice(x)].join('');
@@ -310,6 +538,8 @@
 	  }
 	  return text;
 	};
+	
+	Player.prototype.hitpointsString = Fighter.prototype.hitpointsString;
 	
 	Player.prototype.enterArea = function () {
 	  this.lookAround();
@@ -336,24 +566,100 @@
 
 /***/ },
 /* 5 */
+/***/ function(module, exports) {
+
+	/*jshint sub:true*/
+	Fighter = function (args) {
+	  this.checkText = args.checkText;
+	  this.name = args.name;
+	  this.verbs = args.verbs;
+	  this.description = args.description;
+	  this.hitpoints = args.hitpoints;
+	  this.moves = args.moves;
+	  this.onFight = args.onFight;
+	};
+	
+	Fighter.prototype["check"] = function (noun, player) {
+	  player.display(noun.checkText);
+	  if (this.onCheck) {
+	    this.onCheck();
+	  }
+	};
+	
+	Fighter.prototype["attack"] = function (noun, player) {
+	  player.getMove(noun);
+	};
+	
+	Fighter.prototype.startFight = function (target) {
+	  var move = this.chooseMove();
+	  target.isAttacked(this, move);
+	};
+	
+	Fighter.prototype.chooseMove = function (attackerMove) {
+	  return this.moves[0];
+	  // Move decision logic will be based on data in the Fighter's memory object
+	  // about what has been most effective in the past.
+	};
+	
+	Fighter.prototype.hitpointsString = function () {
+	  var string = "";
+	  for (var x = 0; x < this.hitpoints; x+=3) {
+	    string += "█";
+	  }
+	  if (string.length < this.hitpoints/3) {
+	    string += "▌";
+	  }
+	  return string;
+	};
+	
+	Fighter.prototype.isAttacked = function (opponent, move) {
+	  if (this.onFight) {
+	    this.onFight();
+	  }
+	  var response = this.chooseMove(move);
+	  // The Fighter will sometimes flee, otherwise they attack
+	  if (opponent.haveFightDescribed) {
+	    opponent.haveFightDescribed(this, function () {
+	      this.engage(opponent, opponent.currentMove.data, response);
+	      opponent.engage(this, response, opponent.currentMove.data);
+	    }.bind(this));
+	  }
+	};
+	
+	Fighter.prototype.engage = function (opponent, move, response) {
+	  var damage = 0;
+	  var damageTypes = ['cut', 'stab', 'crush', 'blast'];
+	
+	  damageTypes.forEach(function (type) {
+	    damage += (move.attack[type] - response.defense[type]) < 0 ?
+	    0 : (move.attack[type] - response.defense[type]);
+	  });
+	  this.hitpoints -= damage;
+	};
+	
+	module.exports = Fighter;
+
+
+/***/ },
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Exit = __webpack_require__(6);
-	var Feature = __webpack_require__(7);
+	var Exit = __webpack_require__(7);
+	var Feature = __webpack_require__(8);
 	
 	var worldMap = {};
 	
-	worldMap.backroom = __webpack_require__(8);
-	worldMap.studio = __webpack_require__(10);
-	worldMap.farmhouse = __webpack_require__(11);
-	worldMap.wheatfield = __webpack_require__(13);
+	worldMap.backroom = __webpack_require__(9);
+	worldMap.studio = __webpack_require__(11);
+	worldMap.farmhouse = __webpack_require__(12);
+	worldMap.wheatfield = __webpack_require__(14);
 	
 	module.exports = worldMap;
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Exit = function (args) {
@@ -364,12 +670,16 @@
 	  this.lockCheck = args.lockCheck;
 	  this.keyName = args.keyName;
 	  this.verbs = args.verbs;
+	  this.onExit = args.onExit;
 	  this.description = args.description;
 	};
 	
 	Exit.prototype["go to"] = function (noun, player) {
-	  var worldMap = __webpack_require__(5);
+	  var worldMap = __webpack_require__(6);
 	  player.location = worldMap[noun.destinationName];
+	  if (this.onExit) {
+	    this.onExit();
+	  }
 	  player.enterArea();
 	};
 	
@@ -385,7 +695,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	Feature = function (args) {
@@ -393,12 +703,13 @@
 	  this.name = args.name;
 	  this.verbs = args.verbs;
 	  this.description = args.description;
+	  this.onCheck = args.onCheck;
 	};
 	
 	Feature.prototype["check"] = function (noun, player) {
 	  player.display(noun.checkText);
-	  if (this.onCheck) {
-	    this.onCheck();
+	  if (noun.onCheck) {
+	    noun.onCheck();
 	  }
 	};
 	
@@ -410,18 +721,18 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(7);
-	var Item = __webpack_require__(9);
-	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(8);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
+	  worldMap: this,
 	  description: "A cramped back room in an artist's studio. Some pipes line the far wall.",
 	  name: 'backroom',
-	  worldMap: this,
 	  contents: [
 	    new Exit ({
 	      name: "door",
@@ -455,7 +766,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	Item = function (args) {
@@ -515,17 +826,18 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(7);
-	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(8);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
 	
 	var area = new Area ({
+	  worldMap: this,
 	  description: "A painter's studio. Overhead a ceiling fan drifts in steady circles.",
 	  name: 'studio',
-	  worldMap: this,
 	  contents: [
 	
 	    new Feature ({
@@ -574,14 +886,14 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(7);
-	var Box = __webpack_require__(12);
-	var Item = __webpack_require__(9);
-	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(8);
+	var Box = __webpack_require__(13);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
 	  description: "A single-room building, about ten yards wide in either direction,",
@@ -619,19 +931,19 @@
 	      verbs: ["check"],
 	
 	      onCheck: function () {
-	        this.desctiption = "There is a wooden table in the middle of the room.";
+	        this.description = "There is a wooden table in the middle of the room.";
 	      },
 	    }),
 	    new Feature ({
 	      name: "other table",
-	      description: "Nearby there is an other table, the same as the first",
+	      description: "Nearby there is another table, the same as the first.",
 	      checkText: "Like its twin, this one is made of a cool, light, smooth wood. There is a dead man lying face-up on top of it.",
 	      verbs: ["check"],
 	    }),
 	    new Feature ({
 	      name: "dead man",
 	      description: "A dead man is lying on top of it.",
-	      checkText: "The dead man looks like he's in is mid-forties, healthy aside from being dead. His eyes are open, looking up at the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
+	      checkText: "The dead man looks like he's in his mid-forties, healthy aside from being dead. His eyes are open, looking up at the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
 	      verbs: ["check"],
 	    }),
 	    new Box ({
@@ -652,14 +964,8 @@
 	        }),
 	        new Item ({
 	          name: "dollar bill",
-	          checkText: "A one dollar bill. If you want to take it with you, you can get it.",
+	          checkText: "A one dollar bill.",
 	          description: "a dollar bill",
-	          verbs: ["check", "get"],
-	        }),
-	        new Item ({
-	          name: "phone",
-	          checkText: "It's a smartphone. It has run out of charge.",
-	          description: "a phone",
 	          verbs: ["check", "get"],
 	        }),
 	      ],
@@ -678,11 +984,11 @@
 	    new Item ({
 	      name: "sword",
 	      checkText: "A sword. You can get it if you want it.",
-	      description: "There is a sword leaning next to it.",
+	      description: "There is a sword leaning beside it.",
 	      verbs: ["check", "get"],
 	
 	      onGet: function () {
-	        this.checkText = "A sword.";
+	        this.checkText = "A sword. Use it to defend yourself, or to <v>attack</v>.";
 	      },
 	    }),
 	  ],
@@ -692,7 +998,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	Box = function (args) {
@@ -742,31 +1048,81 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(7);
-	var Box = __webpack_require__(12);
-	var Item = __webpack_require__(9);
-	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(8);
+	var Fighter = __webpack_require__(5);
+	var Box = __webpack_require__(13);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
+	
+	var kannuki = __webpack_require__(15);
 	
 	area = new Area ({
-	  description: "A large barren courtyard, walled in by high-piled stones.",
+	  description: "A large barren courtyard,",
 	  name: 'wheatfield',
 	  worldMap: this,
 	  contents: [
+	    new Feature ({
+	      name: "wall",
+	      description: "walled in by high-piled stones that shield it from the night wind.",
+	      checkText: "The high barrier creates a square courtyard with the east wall of the farmhouse as its fourth side. It looks older than the building beside it, made of porous stone flecked with pieces of shells.",
+	      verbs: ["check"],
+	    }),
 	    new Exit ({
 	      name: "door",
 	      description: "The door back in to the farmhouse is behind you.",
-	      checkText: "A green door.",
+	      checkText: "A green door. You can use it to go to the farmhouse interior again.",
 	      destinationName: 'farmhouse',
 	      verbs: ["check", "go to"],
 	    }),
+	
+	    kannuki
+	
 	  ],
 	});
 	
 	module.exports = area;
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Fighter = __webpack_require__(5);
+	
+	var fighter = new Fighter ({
+	  name: "Kannuki",
+	  description: "An old man, Kannuki, stands facing you, holding a sword. He makes no move to attack.",
+	  checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
+	  verbs: ["check", "attack"],
+	  hitpoints: 100,
+	  onFight: function () {
+	    window.alert('Use the left and right keys to see what moves you know, then use the spacebar to choose.');
+	    this.onFight = null;
+	  }.bind(this),
+	  moves: [
+	    {
+	      name: 'cross cut',
+	      attack: {
+	        cut: 24,
+	        stab: 0,
+	        crush: 0,
+	        blast: 0,
+	      },
+	      defense: {
+	        cut: 12,
+	        stab: 3,
+	        crush: 3,
+	        blast: 0,
+	      },
+	    },
+	  ],
+	});
+	
+	module.exports = fighter;
 
 
 /***/ }

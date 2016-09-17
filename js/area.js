@@ -7,10 +7,10 @@ Area = function (args) {
   this.getNouns = function () {
     var nouns = [];
     for (var x = 0 ; x < this.contents.length ; x++) {
-      nouns.push(this.contents[x].name);
+      nouns.push(this.contents[x].name.toLowerCase());
       if (this.contents[x].contents) {
         for (var z = 0 ; z < this.contents[x].contents.length ; z++) {
-          nouns.push(this.contents[x].contents[z].name);
+          nouns.push(this.contents[x].contents[z].name.toLowerCase());
         }
       }
     }
@@ -42,7 +42,7 @@ Area = function (args) {
 
 Area.prototype.getNoun = function (name) {
   for (var x = 0 ; x < this.contents.length ; x++) {
-    if (this.contents[x].name === name) {
+    if (this.contents[x].name.toLowerCase() === name.toLowerCase()) {
       return this.contents[x];
     }
     if (this.contents[x].contents) {

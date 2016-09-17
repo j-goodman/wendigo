@@ -40,19 +40,19 @@ area = new Area ({
       verbs: ["check"],
 
       onCheck: function () {
-        this.desctiption = "There is a wooden table in the middle of the room.";
+        this.description = "There is a wooden table in the middle of the room.";
       },
     }),
     new Feature ({
       name: "other table",
-      description: "Nearby there is an other table, the same as the first",
+      description: "Nearby there is another table, the same as the first.",
       checkText: "Like its twin, this one is made of a cool, light, smooth wood. There is a dead man lying face-up on top of it.",
       verbs: ["check"],
     }),
     new Feature ({
       name: "dead man",
       description: "A dead man is lying on top of it.",
-      checkText: "The dead man looks like he's in is mid-forties, healthy aside from being dead. His eyes are open, looking up at the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
+      checkText: "The dead man looks like he's in his mid-forties, healthy aside from being dead. His eyes are open, looking up at the ceiling with a placid expression. He's wearing a loose-fitting white dress shirt and pants with pockets in them.",
       verbs: ["check"],
     }),
     new Box ({
@@ -73,14 +73,8 @@ area = new Area ({
         }),
         new Item ({
           name: "dollar bill",
-          checkText: "A one dollar bill. If you want to take it with you, you can get it.",
+          checkText: "A one dollar bill.",
           description: "a dollar bill",
-          verbs: ["check", "get"],
-        }),
-        new Item ({
-          name: "phone",
-          checkText: "It's a smartphone. It has run out of charge.",
-          description: "a phone",
           verbs: ["check", "get"],
         }),
       ],
@@ -99,11 +93,11 @@ area = new Area ({
     new Item ({
       name: "sword",
       checkText: "A sword. You can get it if you want it.",
-      description: "There is a sword leaning next to it.",
+      description: "There is a sword leaning beside it.",
       verbs: ["check", "get"],
 
       onGet: function () {
-        this.checkText = "A sword.";
+        this.checkText = "A sword. Use it to defend yourself, or to <v>attack</v>.";
       },
     }),
   ],
