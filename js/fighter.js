@@ -30,6 +30,17 @@ Fighter.prototype.chooseMove = function (attackerMove) {
   // about what has been most effective in the past.
 };
 
+Fighter.prototype.hitpointsString = function () {
+  var string = "";
+  for (var x = 0; x < this.hitpoints; x+=3) {
+    string += "█";
+  }
+  if (string.length < this.hitpoints/3) {
+    string += "▌";
+  }
+  return string;
+};
+
 Fighter.prototype.isAttacked = function (opponent, move) {
   var response = this.chooseMove(move);
   // The Fighter will sometimes flee, otherwise they attack

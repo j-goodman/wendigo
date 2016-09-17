@@ -123,10 +123,10 @@
 	  this.getNouns = function () {
 	    var nouns = [];
 	    for (var x = 0 ; x < this.contents.length ; x++) {
-	      nouns.push(this.contents[x].name);
+	      nouns.push(this.contents[x].name.toLowerCase());
 	      if (this.contents[x].contents) {
 	        for (var z = 0 ; z < this.contents[x].contents.length ; z++) {
-	          nouns.push(this.contents[x].contents[z].name);
+	          nouns.push(this.contents[x].contents[z].name.toLowerCase());
 	        }
 	      }
 	    }
@@ -158,7 +158,7 @@
 	
 	Area.prototype.getNoun = function (name) {
 	  for (var x = 0 ; x < this.contents.length ; x++) {
-	    if (this.contents[x].name === name) {
+	    if (this.contents[x].name.toLowerCase() === name.toLowerCase()) {
 	      return this.contents[x];
 	    }
 	    if (this.contents[x].contents) {
@@ -260,8 +260,11 @@
 	  this.playerWindow.className = 'fight-window';
 	  this.scrollDown(13);
 	  console.log("Player move:");
-	  console.log(player.moves[0]);
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.moves[0]);
+	  console.log(fight.opponent);
+	  console.log(fight.opponent.moves[0]);
+	  this.playerWindow.innerHTML += this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  console.log('Populated window with fighter data.');
 	  // console.log(fight.player);
 	  // console.log(this.playerWindow.innerHTML);
 	  // this.playerWindow.innerHTML = '<ul>';
@@ -341,8 +344,10 @@
 
 /***/ },
 /* 4 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
+	var Fighter = __webpack_require__(14);
+	
 	Player = function (args) {
 	  this.name = args.name;
 	  this.book = args.book;
@@ -390,6 +395,9 @@
 	    return undefined;
 	  } else {
 	    this.display("");
+	    console.log('!');
+	    console.log(this.location.getNoun(noun));
+	    console.log('!');
 	    if (this.location.getNoun(noun)) {
 	      noun = this.location.getNoun(noun);
 	    } else if (this.getInventoryNoun(noun)) {
@@ -479,14 +487,14 @@
 	  for (x = 0 ; x < text.length-1 ; x++) {
 	    for (var y = 1 ; y < text.length ; y++) {
 	      var output;
-	      if (nouns.includes(text.slice(x, y))) {
+	      if (nouns.includes(text.slice(x, y).toLowerCase())) {
 	        output = text;
 	        if (text.slice(x-3, x) !== "<n>") {
 	          output = [text.slice(0, x), "<n>", text.slice(x)].join('');
 	          output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
 	        }
 	        text = output;
-	      } else if (verbs.includes(text.slice(x, y))) {
+	      } else if (verbs.includes(text.slice(x, y).toLowerCase())) {
 	        output = text;
 	        if (text.slice(x-3, x) !== "<v>") {
 	          output = [text.slice(0, x), "<v>", text.slice(x)].join('');
@@ -499,16 +507,7 @@
 	  return text;
 	};
 	
-	Player.prototype.hitpointsString = function () {
-	  var string = "";
-	  for (var x = 0; x < this.hitpoints; x+=3) {
-	    string += "█";
-	  }
-	  if (string.length < this.hitpoints/3) {
-	    string += "▌";
-	  }
-	  return string;
-	};
+	Player.prototype.hitpointsString = Fighter.prototype.hitpointsString;
 	
 	Player.prototype.enterArea = function () {
 	  this.lookAround();
@@ -1017,6 +1016,17 @@
 	  // about what has been most effective in the past.
 	};
 	
+	Fighter.prototype.hitpointsString = function () {
+	  var string = "";
+	  for (var x = 0; x < this.hitpoints; x+=3) {
+	    string += "█";
+	  }
+	  if (string.length < this.hitpoints/3) {
+	    string += "▌";
+	  }
+	  return string;
+	};
+	
 	Fighter.prototype.isAttacked = function (opponent, move) {
 	  var response = this.chooseMove(move);
 	  // The Fighter will sometimes flee, otherwise they attack
@@ -1045,8 +1055,8 @@
 	var Fighter = __webpack_require__(14);
 	
 	var fighter = new Fighter ({
-	  name: "old man",
-	  description: "An old man stands facing you, holding a sword.",
+	  name: "Kannuki",
+	  description: "An old man, Kannuki, stands facing you, holding a sword.",
 	  checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
 	  verbs: ["check", "attack"],
 	  hitpoints: 100,

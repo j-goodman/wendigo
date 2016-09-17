@@ -1,3 +1,5 @@
+var Fighter = require('./fighter.js');
+
 Player = function (args) {
   this.name = args.name;
   this.book = args.book;
@@ -45,6 +47,9 @@ Player.prototype.executeCommand = function (verb, noun) {
     return undefined;
   } else {
     this.display("");
+    console.log('!');
+    console.log(this.location.getNoun(noun));
+    console.log('!');
     if (this.location.getNoun(noun)) {
       noun = this.location.getNoun(noun);
     } else if (this.getInventoryNoun(noun)) {
@@ -134,14 +139,14 @@ Player.prototype.highlight = function (text) {
   for (x = 0 ; x < text.length-1 ; x++) {
     for (var y = 1 ; y < text.length ; y++) {
       var output;
-      if (nouns.includes(text.slice(x, y))) {
+      if (nouns.includes(text.slice(x, y).toLowerCase())) {
         output = text;
         if (text.slice(x-3, x) !== "<n>") {
           output = [text.slice(0, x), "<n>", text.slice(x)].join('');
           output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
         }
         text = output;
-      } else if (verbs.includes(text.slice(x, y))) {
+      } else if (verbs.includes(text.slice(x, y).toLowerCase())) {
         output = text;
         if (text.slice(x-3, x) !== "<v>") {
           output = [text.slice(0, x), "<v>", text.slice(x)].join('');
@@ -154,16 +159,7 @@ Player.prototype.highlight = function (text) {
   return text;
 };
 
-Player.prototype.hitpointsString = function () {
-  var string = "";
-  for (var x = 0; x < this.hitpoints; x+=3) {
-    string += "█";
-  }
-  if (string.length < this.hitpoints/3) {
-    string += "▌";
-  }
-  return string;
-};
+Player.prototype.hitpointsString = Fighter.prototype.hitpointsString;
 
 Player.prototype.enterArea = function () {
   this.lookAround();
