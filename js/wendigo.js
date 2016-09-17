@@ -46,8 +46,8 @@
 
 	var Area = __webpack_require__(1);
 	var Book = __webpack_require__(2);
-	var Player = __webpack_require__(3);
-	var worldMap = __webpack_require__(4);
+	var Player = __webpack_require__(4);
+	var worldMap = __webpack_require__(5);
 	
 	window.onload = function () {
 	  init();
@@ -196,7 +196,8 @@
 
 
 /***/ },
-/* 3 */
+/* 3 */,
+/* 4 */
 /***/ function(module, exports) {
 
 	Player = function (args) {
@@ -334,25 +335,25 @@
 
 
 /***/ },
-/* 4 */
+/* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Exit = __webpack_require__(5);
-	var Feature = __webpack_require__(6);
+	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(7);
 	
 	var worldMap = {};
 	
-	worldMap.backroom = __webpack_require__(7);
-	worldMap.studio = __webpack_require__(9);
-	worldMap.farmhouse = __webpack_require__(10);
-	worldMap.wheatfield = __webpack_require__(12);
+	worldMap.backroom = __webpack_require__(8);
+	worldMap.studio = __webpack_require__(10);
+	worldMap.farmhouse = __webpack_require__(11);
+	worldMap.wheatfield = __webpack_require__(13);
 	
 	module.exports = worldMap;
 
 
 /***/ },
-/* 5 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Exit = function (args) {
@@ -367,7 +368,7 @@
 	};
 	
 	Exit.prototype["go to"] = function (noun, player) {
-	  var worldMap = __webpack_require__(4);
+	  var worldMap = __webpack_require__(5);
 	  player.location = worldMap[noun.destinationName];
 	  player.enterArea();
 	};
@@ -384,7 +385,7 @@
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports) {
 
 	Feature = function (args) {
@@ -409,13 +410,13 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(6);
-	var Item = __webpack_require__(8);
-	var Exit = __webpack_require__(5);
+	var Feature = __webpack_require__(7);
+	var Item = __webpack_require__(9);
+	var Exit = __webpack_require__(6);
 	
 	area = new Area ({
 	  description: "A cramped back room in an artist's studio. Some pipes line the far wall.",
@@ -454,7 +455,7 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports) {
 
 	Item = function (args) {
@@ -514,12 +515,12 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(6);
-	var Exit = __webpack_require__(5);
+	var Feature = __webpack_require__(7);
+	var Exit = __webpack_require__(6);
 	
 	var area = new Area ({
 	  description: "A painter's studio. Overhead a ceiling fan drifts in steady circles.",
@@ -573,14 +574,14 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(6);
-	var Box = __webpack_require__(11);
-	var Item = __webpack_require__(8);
-	var Exit = __webpack_require__(5);
+	var Feature = __webpack_require__(7);
+	var Box = __webpack_require__(12);
+	var Item = __webpack_require__(9);
+	var Exit = __webpack_require__(6);
 	
 	area = new Area ({
 	  description: "A single-room building, about ten yards wide in either direction,",
@@ -691,7 +692,7 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports) {
 
 	Box = function (args) {
@@ -741,14 +742,14 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(6);
-	var Box = __webpack_require__(11);
-	var Item = __webpack_require__(8);
-	var Exit = __webpack_require__(5);
+	var Feature = __webpack_require__(7);
+	var Box = __webpack_require__(12);
+	var Item = __webpack_require__(9);
+	var Exit = __webpack_require__(6);
 	
 	area = new Area ({
 	  description: "A large barren courtyard, walled in by high-piled stones.",
