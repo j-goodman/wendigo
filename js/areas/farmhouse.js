@@ -40,7 +40,7 @@ area = new Area ({
       verbs: ["check"],
 
       onCheck: function () {
-        this.desctiption = "There is a wooden table in the middle of the room.";
+        this.description = "There is a wooden table in the middle of the room.";
       },
     }),
     new Feature ({
@@ -75,12 +75,6 @@ area = new Area ({
           name: "dollar bill",
           checkText: "A one dollar bill.",
           description: "a dollar bill",
-          verbs: ["check", "get"],
-        }),
-        new Item ({
-          name: "phone",
-          checkText: "It's a smartphone. It has run out of charge.",
-          description: "a phone",
           verbs: ["check", "get"],
         }),
       ],

@@ -64,7 +64,7 @@ Book.prototype.scrollDown = function (scrollDelta, diff) {
   }
 };
 
-Book.prototype.describeFight = function (player, opponent) {
+Book.prototype.describeFight = function (player, opponent, callback) {
   var fight = {
     player: player,
     opponent: opponent,
@@ -84,18 +84,12 @@ Book.prototype.describeFight = function (player, opponent) {
   };
   this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
   this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
-  // this.playerWindow.innerHTML = '<ul>';
-  // this.playerWindow.innerHTML += '<li>' + fight.player.name + '</li><li>' + fight.player.moves[0].name + '</li>';
-  // this.playerWindow.innerHTML += '<li>' + fight.opponent.name + '</li>';
-  // this.playerWindow.innerHTML += '<ul>';
-  this.setUpFightControls(fight);
+  this.setUpFightControls(fight, callback);
 };
 
-Book.prototype.setUpFightControls = function (fight) {
-  var left; var right; var slideLeft; var slideRight; var player;
+Book.prototype.setUpFightControls = function (fight, callback) {
+  var slideLeft; var slideRight; var player;
   player = fight.player;
-  left = document.getElementsByClassName('move-lefty')[0];
-  right = document.getElementsByClassName('move-righty')[0];
   slideLeft = function () {
     player.currentMove.index -= 1;
     if (player.currentMove.index < 0) {
@@ -121,7 +115,15 @@ Book.prototype.setUpFightControls = function (fight) {
     if (event.key == 'ArrowRight') {
       slideRight();
     }
+    if (event.key == ' ') {
+      callback();
+    }
   };
+};
+
+Book.prototype.updateFightDisplay = function (player, opponent) {
+  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
 };
 
 Book.prototype.printFightMove = function (move) {

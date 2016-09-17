@@ -6,6 +6,7 @@ Fighter = function (args) {
   this.description = args.description;
   this.hitpoints = args.hitpoints;
   this.moves = args.moves;
+  this.onFight = args.onFight;
 };
 
 Fighter.prototype["check"] = function (noun, player) {
@@ -42,10 +43,17 @@ Fighter.prototype.hitpointsString = function () {
 };
 
 Fighter.prototype.isAttacked = function (opponent, move) {
+  if (this.onFight) {
+    this.onFight();
+  }
   var response = this.chooseMove(move);
   // The Fighter will sometimes flee, otherwise they attack
-  this.engage(opponent, move, response);
-  opponent.engage(this, response, move);
+  if (opponent.haveFightDescribed) {
+    opponent.haveFightDescribed(this, function () {
+      this.engage(opponent, opponent.currentMove.data, response);
+      opponent.engage(this, response, opponent.currentMove.data);
+    }.bind(this));
+  }
 };
 
 Fighter.prototype.engage = function (opponent, move, response) {

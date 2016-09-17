@@ -92,12 +92,13 @@ Player.prototype.executeCommand = function (verb, noun) {
   Player.prototype.isAttacked = function (opponent, move) {
     var response = this.chooseMove(move);
     // The Player can either engage or flee.
-    this.engage(opponent, move, response);
-    opponent.engage(this, response, move);
+  };
+
+  Player.prototype.haveFightDescribed = function (opponent, callback) {
+    this.book.describeFight(this, opponent, callback);
   };
 
   Player.prototype.engage = function (opponent, move, response) {
-    this.book.describeFight(this, opponent);
     var damage = 0;
     var damageTypes = ['cut', 'stab', 'crush', 'blast'];
 
@@ -107,6 +108,7 @@ Player.prototype.executeCommand = function (verb, noun) {
     });
 
     this.hitpoints -= damage;
+    this.book.updateFightDisplay(this, opponent);
   };
 };
 

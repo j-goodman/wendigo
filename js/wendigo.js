@@ -69,30 +69,45 @@
 	      {
 	        name: 'forward thrust',
 	        attack: {
-	          cut: 2,
-	          stab: 14,
-	          crush: 4,
+	          cut: 0,
+	          stab: 24,
+	          crush: 0,
 	          blast: 0,
 	        },
 	        defense: {
-	          cut: 8,
-	          stab: 2,
-	          crush: 3,
+	          cut: 12,
+	          stab: 3,
+	          crush: 6,
 	          blast: 0,
 	        },
 	      },
 	      {
 	        name: 'cross cut',
 	        attack: {
-	          cut: 14,
+	          cut: 24,
 	          stab: 0,
-	          crush: 6,
+	          crush: 0,
 	          blast: 0,
 	        },
 	        defense: {
-	          cut: 4,
-	          stab: 7,
-	          crush: 2,
+	          cut: 12,
+	          stab: 3,
+	          crush: 3,
+	          blast: 0,
+	        },
+	      },
+	      {
+	        name: 'cautious feint',
+	        attack: {
+	          cut: 5,
+	          stab: 5,
+	          crush: 0,
+	          blast: 0,
+	        },
+	        defense: {
+	          cut: 18,
+	          stab: 18,
+	          crush: 0,
 	          blast: 0,
 	        },
 	      },
@@ -242,7 +257,7 @@
 	  }
 	};
 	
-	Book.prototype.describeFight = function (player, opponent) {
+	Book.prototype.describeFight = function (player, opponent, callback) {
 	  var fight = {
 	    player: player,
 	    opponent: opponent,
@@ -262,18 +277,12 @@
 	  };
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
 	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
-	  // this.playerWindow.innerHTML = '<ul>';
-	  // this.playerWindow.innerHTML += '<li>' + fight.player.name + '</li><li>' + fight.player.moves[0].name + '</li>';
-	  // this.playerWindow.innerHTML += '<li>' + fight.opponent.name + '</li>';
-	  // this.playerWindow.innerHTML += '<ul>';
-	  this.setUpFightControls(fight);
+	  this.setUpFightControls(fight, callback);
 	};
 	
-	Book.prototype.setUpFightControls = function (fight) {
-	  var left; var right; var slideLeft; var slideRight; var player;
+	Book.prototype.setUpFightControls = function (fight, callback) {
+	  var slideLeft; var slideRight; var player;
 	  player = fight.player;
-	  left = document.getElementsByClassName('move-lefty')[0];
-	  right = document.getElementsByClassName('move-righty')[0];
 	  slideLeft = function () {
 	    player.currentMove.index -= 1;
 	    if (player.currentMove.index < 0) {
@@ -299,7 +308,15 @@
 	    if (event.key == 'ArrowRight') {
 	      slideRight();
 	    }
+	    if (event.key == ' ') {
+	      callback();
+	    }
 	  };
+	};
+	
+	Book.prototype.updateFightDisplay = function (player, opponent) {
+	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
 	};
 	
 	Book.prototype.printFightMove = function (move) {
@@ -460,12 +477,13 @@
 	  Player.prototype.isAttacked = function (opponent, move) {
 	    var response = this.chooseMove(move);
 	    // The Player can either engage or flee.
-	    this.engage(opponent, move, response);
-	    opponent.engage(this, response, move);
+	  };
+	
+	  Player.prototype.haveFightDescribed = function (opponent, callback) {
+	    this.book.describeFight(this, opponent, callback);
 	  };
 	
 	  Player.prototype.engage = function (opponent, move, response) {
-	    this.book.describeFight(this, opponent);
 	    var damage = 0;
 	    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
 	
@@ -475,6 +493,7 @@
 	    });
 	
 	    this.hitpoints -= damage;
+	    this.book.updateFightDisplay(this, opponent);
 	  };
 	};
 	
@@ -575,12 +594,16 @@
 	  this.lockCheck = args.lockCheck;
 	  this.keyName = args.keyName;
 	  this.verbs = args.verbs;
+	  this.onExit = args.onExit;
 	  this.description = args.description;
 	};
 	
 	Exit.prototype["go to"] = function (noun, player) {
 	  var worldMap = __webpack_require__(5);
 	  player.location = worldMap[noun.destinationName];
+	  if (this.onExit) {
+	    this.onExit();
+	  }
 	  player.enterArea();
 	};
 	
@@ -604,12 +627,13 @@
 	  this.name = args.name;
 	  this.verbs = args.verbs;
 	  this.description = args.description;
+	  this.onCheck = args.onCheck;
 	};
 	
 	Feature.prototype["check"] = function (noun, player) {
 	  player.display(noun.checkText);
-	  if (this.onCheck) {
-	    this.onCheck();
+	  if (noun.onCheck) {
+	    noun.onCheck();
 	  }
 	};
 	
@@ -831,7 +855,7 @@
 	      verbs: ["check"],
 	
 	      onCheck: function () {
-	        this.desctiption = "There is a wooden table in the middle of the room.";
+	        this.description = "There is a wooden table in the middle of the room.";
 	      },
 	    }),
 	    new Feature ({
@@ -866,12 +890,6 @@
 	          name: "dollar bill",
 	          checkText: "A one dollar bill.",
 	          description: "a dollar bill",
-	          verbs: ["check", "get"],
-	        }),
-	        new Item ({
-	          name: "phone",
-	          checkText: "It's a smartphone. It has run out of charge.",
-	          description: "a phone",
 	          verbs: ["check", "get"],
 	        }),
 	      ],
@@ -1005,6 +1023,7 @@
 	  this.description = args.description;
 	  this.hitpoints = args.hitpoints;
 	  this.moves = args.moves;
+	  this.onFight = args.onFight;
 	};
 	
 	Fighter.prototype["check"] = function (noun, player) {
@@ -1041,10 +1060,17 @@
 	};
 	
 	Fighter.prototype.isAttacked = function (opponent, move) {
+	  if (this.onFight) {
+	    this.onFight();
+	  }
 	  var response = this.chooseMove(move);
 	  // The Fighter will sometimes flee, otherwise they attack
-	  this.engage(opponent, move, response);
-	  opponent.engage(this, response, move);
+	  if (opponent.haveFightDescribed) {
+	    opponent.haveFightDescribed(this, function () {
+	      this.engage(opponent, opponent.currentMove.data, response);
+	      opponent.engage(this, response, opponent.currentMove.data);
+	    }.bind(this));
+	  }
 	};
 	
 	Fighter.prototype.engage = function (opponent, move, response) {
@@ -1069,23 +1095,27 @@
 	
 	var fighter = new Fighter ({
 	  name: "Kannuki",
-	  description: "An old man, Kannuki, stands facing you, holding a sword.",
+	  description: "An old man, Kannuki, stands facing you, holding a sword. He makes no move to attack.",
 	  checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
 	  verbs: ["check", "attack"],
 	  hitpoints: 100,
+	  onFight: function () {
+	    window.alert('Use the left and right keys to see what moves you know, then use the spacebar to choose.');
+	    this.onFight = null;
+	  }.bind(this),
 	  moves: [
 	    {
 	      name: 'cross cut',
 	      attack: {
-	        cut: 14,
+	        cut: 24,
 	        stab: 0,
-	        crush: 6,
+	        crush: 0,
 	        blast: 0,
 	      },
 	      defense: {
-	        cut: 4,
-	        stab: 7,
-	        crush: 2,
+	        cut: 12,
+	        stab: 3,
+	        crush: 3,
 	        blast: 0,
 	      },
 	    },
