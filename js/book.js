@@ -76,7 +76,8 @@ Book.prototype.describeFight = function (player, opponent) {
     }.bind(this),
   };
   this.playerWindow.className = 'fight-window';
-  this.scrollDown(13);
+  this.input.blur();
+  this.scrollDown(14);
   console.log("Player move:");
   this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.moves[0]);
   console.log(fight.opponent);

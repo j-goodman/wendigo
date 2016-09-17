@@ -52,7 +52,7 @@
     border: 1px solid #332;
     display: flex;
     flex-direction: column;
-    height: 760px;
+    height: 920px;
     position: relative;
     top: -16px;
     padding-top: 32px;
@@ -65,7 +65,7 @@
     border: 1px solid #332;
     display: flex;
     flex-direction: column;
-    height: 760px;
+    height: 920px;
     position: relative;
     top: -16px;
     padding-top: 32px;
@@ -115,7 +115,7 @@
 
   .fight-window {
     list-style: none;
-    min-height: 386px;
+    min-height: 545px;
     text-align: center;
     transition: min-height .4s;
   }
@@ -147,6 +147,36 @@
 
   v {
     color: #bcb7b4;
+  }
+
+  .move-stat {
+    font-size: 15px;
+    margin-top: 6px;
+    opacity: 0.9;
+  }
+
+  .move-instruction {
+    font-size: 13px;
+    margin-top: 9px;
+  }
+
+  .healthbar {
+    font-size: 11.5px;
+    opacity: 0.9;
+  }
+
+  .move-lefty {
+    cursor: pointer;
+    margin-right: 48px;
+  }
+
+  .move-righty {
+    cursor: pointer;
+    margin-left: 48px;
+  }
+
+  .move-righty:hover, .move-lefty:hover {
+    opacity: 0.6;
   }
 
 </style>
