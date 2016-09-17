@@ -65,6 +65,12 @@ Fighter.prototype.engage = function (opponent, move, response) {
     0 : (move.attack[type] - response.defense[type]);
   });
   this.hitpoints -= damage;
+  if (this.hitpoints < 0) {
+    window.alert("You beat Kannuki! The game is only a demo right now -- that's all we've got so far.");
+  }
+  if (opponent.hitpoints < 0) {
+    window.alert("Kannuki killed you! The game is only a demo right now -- that's all we've got so far.");
+  }
 };
 
 module.exports = Fighter;
