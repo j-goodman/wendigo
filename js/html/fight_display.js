@@ -1,6 +1,5 @@
 fight_display = {};
 fight_display.move = function (move) {
-  console.log("Preparing move display");
   return ""+
   "<ul class='move'> "+
     "<li><span class='move-lefty'>◀</span> "+move.name+" <span class='move-righty'>▶</span></li>"+
@@ -8,7 +7,6 @@ fight_display.move = function (move) {
     "<v class='move-stat'>"+move.attack.crush+"♣ "+move.attack.cut+"♦ "+move.attack.blast+"♥ "+move.attack.stab+"♠"+"</v>"+
     "<li class='move-stat'>defense:</li>  "+
     "<n class='move-stat'>"+move.defense.crush+"♣ "+move.defense.cut+"♦ "+move.defense.blast+"♥ "+move.defense.stab+"♠ "+"</n>"+
-    "<li class='move-instruction'>[enter]</li>"+
   "</ul> "+
 "  "+
   "<style media='screen'>  "+
@@ -22,11 +20,6 @@ fight_display.move = function (move) {
 "  ";
 };
 fight_display.fighter = function (fighter, move) {
-  console.log("Preparing fighter display:");
-  console.log("  fighter:");
-  console.log(fighter);
-  console.log("  move:");
-  console.log(move);
   return "  "+
 "  "+
   "<section class='display'> "+

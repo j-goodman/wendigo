@@ -4,14 +4,12 @@ var Player = require('./player.js');
 var worldMap = require('./world.js');
 
 window.onload = function () {
-  console.log("Window loaded.");
   init();
 };
 
 var init = function () {
   game = {};
   game.worldMap = worldMap;
-  console.log("Initializing player.");
   game.player = new Player ({
     book: new Book ({
       inputId: 'main-input',
@@ -58,7 +56,5 @@ var init = function () {
     worldMap: game.worldMap,
   });
   game.player.init();
-  console.log("Initializing book.");
   game.player.book.init();
-  console.log("Initialized.");
 };

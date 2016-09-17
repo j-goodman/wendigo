@@ -47,17 +47,15 @@
 	var Area = __webpack_require__(1);
 	var Book = __webpack_require__(2);
 	var Player = __webpack_require__(4);
-	var worldMap = __webpack_require__(6);
+	var worldMap = __webpack_require__(5);
 	
 	window.onload = function () {
-	  console.log("Window loaded.");
 	  init();
 	};
 	
 	var init = function () {
 	  game = {};
 	  game.worldMap = worldMap;
-	  console.log("Initializing player.");
 	  game.player = new Player ({
 	    book: new Book ({
 	      inputId: 'main-input',
@@ -104,9 +102,7 @@
 	    worldMap: game.worldMap,
 	  });
 	  game.player.init();
-	  console.log("Initializing book.");
 	  game.player.book.init();
-	  console.log("Initialized.");
 	};
 
 
@@ -259,21 +255,51 @@
 	  };
 	  this.playerWindow.className = 'fight-window';
 	  this.input.blur();
-	  this.scrollDown(14);
-	  console.log("Player move:");
-	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.moves[0]);
-	  console.log(fight.opponent);
-	  console.log(fight.opponent.moves[0]);
-	  this.playerWindow.innerHTML += this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
-	  console.log('Populated window with fighter data.');
-	  // console.log(fight.player);
-	  // console.log(this.playerWindow.innerHTML);
+	  this.scrollDown(16);
+	  fight.player.currentMove = {
+	    index: 0,
+	    data: player.moves[0],
+	  };
+	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  // this.playerWindow.innerHTML = '<ul>';
 	  // this.playerWindow.innerHTML += '<li>' + fight.player.name + '</li><li>' + fight.player.moves[0].name + '</li>';
 	  // this.playerWindow.innerHTML += '<li>' + fight.opponent.name + '</li>';
 	  // this.playerWindow.innerHTML += '<ul>';
-	  var fightText = fight.player.name + "\n" + "";
-	  this.areaWindow.innerHTML = fightText;
+	  this.setUpFightControls(fight);
+	};
+	
+	Book.prototype.setUpFightControls = function (fight) {
+	  var left; var right; var slideLeft; var slideRight; var player;
+	  player = fight.player;
+	  left = document.getElementsByClassName('move-lefty')[0];
+	  right = document.getElementsByClassName('move-righty')[0];
+	  slideLeft = function () {
+	    player.currentMove.index -= 1;
+	    if (player.currentMove.index < 0) {
+	      player.currentMove.index = player.moves.length-1;
+	    }
+	    player.currentMove.data = player.moves[player.currentMove.index];
+	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+	    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  }.bind(this);
+	  slideRight = function () {
+	    player.currentMove.index += 1;
+	    if (player.currentMove.index >= player.moves.length) {
+	      player.currentMove.index = 0;
+	    }
+	    player.currentMove.data = player.moves[player.currentMove.index];
+	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+	    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  }.bind(this);
+	  window.onkeydown = function (event) {
+	    if (event.key == 'ArrowLeft') {
+	      slideLeft();
+	    }
+	    if (event.key == 'ArrowRight') {
+	      slideRight();
+	    }
+	  };
 	};
 	
 	Book.prototype.printFightMove = function (move) {
@@ -293,7 +319,6 @@
 
 	fight_display = {};
 	fight_display.move = function (move) {
-	  console.log("Preparing move display");
 	  return ""+
 	  "<ul class='move'> "+
 	    "<li><span class='move-lefty'>◀</span> "+move.name+" <span class='move-righty'>▶</span></li>"+
@@ -301,7 +326,6 @@
 	    "<v class='move-stat'>"+move.attack.crush+"♣ "+move.attack.cut+"♦ "+move.attack.blast+"♥ "+move.attack.stab+"♠"+"</v>"+
 	    "<li class='move-stat'>defense:</li>  "+
 	    "<n class='move-stat'>"+move.defense.crush+"♣ "+move.defense.cut+"♦ "+move.defense.blast+"♥ "+move.defense.stab+"♠ "+"</n>"+
-	    "<li class='move-instruction'>[enter]</li>"+
 	  "</ul> "+
 	"  "+
 	  "<style media='screen'>  "+
@@ -315,11 +339,6 @@
 	"  ";
 	};
 	fight_display.fighter = function (fighter, move) {
-	  console.log("Preparing fighter display:");
-	  console.log("  fighter:");
-	  console.log(fighter);
-	  console.log("  move:");
-	  console.log(move);
 	  return "  "+
 	"  "+
 	  "<section class='display'> "+
@@ -347,7 +366,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Fighter = __webpack_require__(5);
+	var Fighter = __webpack_require__(14);
 	
 	Player = function (args) {
 	  this.name = args.name;
@@ -396,9 +415,6 @@
 	    return undefined;
 	  } else {
 	    this.display("");
-	    console.log('!');
-	    console.log(this.location.getNoun(noun));
-	    console.log('!');
 	    if (this.location.getNoun(noun)) {
 	      noun = this.location.getNoun(noun);
 	    } else if (this.getInventoryNoun(noun)) {
@@ -449,8 +465,6 @@
 	  };
 	
 	  Player.prototype.engage = function (opponent, move, response) {
-	    console.log("Engaged");
-	    console.log(this.book.describeFight);
 	    this.book.describeFight(this, opponent);
 	    var damage = 0;
 	    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
@@ -460,9 +474,7 @@
 	      0 : (move.attack[type] - response.defense[type]);
 	    });
 	
-	    console.log(this.hitpoints);
 	    this.hitpoints -= damage;
-	    console.log(this.hitpoints);
 	  };
 	};
 	
@@ -535,92 +547,24 @@
 
 /***/ },
 /* 5 */
-/***/ function(module, exports) {
-
-	/*jshint sub:true*/
-	Fighter = function (args) {
-	  this.checkText = args.checkText;
-	  this.name = args.name;
-	  this.verbs = args.verbs;
-	  this.description = args.description;
-	  this.hitpoints = args.hitpoints;
-	  this.moves = args.moves;
-	};
-	
-	Fighter.prototype["check"] = function (noun, player) {
-	  player.display(noun.checkText);
-	  if (this.onCheck) {
-	    this.onCheck();
-	  }
-	};
-	
-	Fighter.prototype["attack"] = function (noun, player) {
-	  player.getMove(noun);
-	};
-	
-	Fighter.prototype.startFight = function (target) {
-	  var move = this.chooseMove();
-	  target.isAttacked(this, move);
-	};
-	
-	Fighter.prototype.chooseMove = function (attackerMove) {
-	  return this.moves[0];
-	  // Move decision logic will be based on data in the Fighter's memory object
-	  // about what has been most effective in the past.
-	};
-	
-	Fighter.prototype.hitpointsString = function () {
-	  var string = "";
-	  for (var x = 0; x < this.hitpoints; x+=3) {
-	    string += "█";
-	  }
-	  if (string.length < this.hitpoints/3) {
-	    string += "▌";
-	  }
-	  return string;
-	};
-	
-	Fighter.prototype.isAttacked = function (opponent, move) {
-	  var response = this.chooseMove(move);
-	  // The Fighter will sometimes flee, otherwise they attack
-	  this.engage(opponent, move, response);
-	  opponent.engage(this, response, move);
-	};
-	
-	Fighter.prototype.engage = function (opponent, move, response) {
-	  var damage = 0;
-	  var damageTypes = ['cut', 'stab', 'crush', 'blast'];
-	
-	  damageTypes.forEach(function (type) {
-	    damage += (move.attack[type] - response.defense[type]) < 0 ?
-	    0 : (move.attack[type] - response.defense[type]);
-	  });
-	  this.hitpoints -= damage;
-	};
-	
-	module.exports = Fighter;
-
-
-/***/ },
-/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Exit = __webpack_require__(7);
-	var Feature = __webpack_require__(8);
+	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(7);
 	
 	var worldMap = {};
 	
-	worldMap.backroom = __webpack_require__(9);
-	worldMap.studio = __webpack_require__(11);
-	worldMap.farmhouse = __webpack_require__(12);
-	worldMap.wheatfield = __webpack_require__(14);
+	worldMap.backroom = __webpack_require__(8);
+	worldMap.studio = __webpack_require__(10);
+	worldMap.farmhouse = __webpack_require__(11);
+	worldMap.wheatfield = __webpack_require__(13);
 	
 	module.exports = worldMap;
 
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Exit = function (args) {
@@ -635,7 +579,7 @@
 	};
 	
 	Exit.prototype["go to"] = function (noun, player) {
-	  var worldMap = __webpack_require__(6);
+	  var worldMap = __webpack_require__(5);
 	  player.location = worldMap[noun.destinationName];
 	  player.enterArea();
 	};
@@ -652,7 +596,7 @@
 
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports) {
 
 	Feature = function (args) {
@@ -677,13 +621,13 @@
 
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(8);
-	var Item = __webpack_require__(10);
-	var Exit = __webpack_require__(7);
+	var Feature = __webpack_require__(7);
+	var Item = __webpack_require__(9);
+	var Exit = __webpack_require__(6);
 	
 	area = new Area ({
 	  worldMap: this,
@@ -722,7 +666,7 @@
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports) {
 
 	Item = function (args) {
@@ -782,13 +726,13 @@
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(8);
-	var Item = __webpack_require__(10);
-	var Exit = __webpack_require__(7);
+	var Feature = __webpack_require__(7);
+	var Item = __webpack_require__(9);
+	var Exit = __webpack_require__(6);
 	
 	var area = new Area ({
 	  worldMap: this,
@@ -842,14 +786,14 @@
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(8);
-	var Box = __webpack_require__(13);
-	var Item = __webpack_require__(10);
-	var Exit = __webpack_require__(7);
+	var Feature = __webpack_require__(7);
+	var Box = __webpack_require__(12);
+	var Item = __webpack_require__(9);
+	var Exit = __webpack_require__(6);
 	
 	area = new Area ({
 	  description: "A single-room building, about ten yards wide in either direction,",
@@ -960,7 +904,7 @@
 
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports) {
 
 	Box = function (args) {
@@ -1010,15 +954,15 @@
 
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(8);
-	var Fighter = __webpack_require__(5);
-	var Box = __webpack_require__(13);
-	var Item = __webpack_require__(10);
-	var Exit = __webpack_require__(7);
+	var Feature = __webpack_require__(7);
+	var Fighter = __webpack_require__(14);
+	var Box = __webpack_require__(12);
+	var Item = __webpack_require__(9);
+	var Exit = __webpack_require__(6);
 	
 	var kannuki = __webpack_require__(15);
 	
@@ -1050,10 +994,78 @@
 
 
 /***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	/*jshint sub:true*/
+	Fighter = function (args) {
+	  this.checkText = args.checkText;
+	  this.name = args.name;
+	  this.verbs = args.verbs;
+	  this.description = args.description;
+	  this.hitpoints = args.hitpoints;
+	  this.moves = args.moves;
+	};
+	
+	Fighter.prototype["check"] = function (noun, player) {
+	  player.display(noun.checkText);
+	  if (this.onCheck) {
+	    this.onCheck();
+	  }
+	};
+	
+	Fighter.prototype["attack"] = function (noun, player) {
+	  player.getMove(noun);
+	};
+	
+	Fighter.prototype.startFight = function (target) {
+	  var move = this.chooseMove();
+	  target.isAttacked(this, move);
+	};
+	
+	Fighter.prototype.chooseMove = function (attackerMove) {
+	  return this.moves[0];
+	  // Move decision logic will be based on data in the Fighter's memory object
+	  // about what has been most effective in the past.
+	};
+	
+	Fighter.prototype.hitpointsString = function () {
+	  var string = "";
+	  for (var x = 0; x < this.hitpoints; x+=3) {
+	    string += "█";
+	  }
+	  if (string.length < this.hitpoints/3) {
+	    string += "▌";
+	  }
+	  return string;
+	};
+	
+	Fighter.prototype.isAttacked = function (opponent, move) {
+	  var response = this.chooseMove(move);
+	  // The Fighter will sometimes flee, otherwise they attack
+	  this.engage(opponent, move, response);
+	  opponent.engage(this, response, move);
+	};
+	
+	Fighter.prototype.engage = function (opponent, move, response) {
+	  var damage = 0;
+	  var damageTypes = ['cut', 'stab', 'crush', 'blast'];
+	
+	  damageTypes.forEach(function (type) {
+	    damage += (move.attack[type] - response.defense[type]) < 0 ?
+	    0 : (move.attack[type] - response.defense[type]);
+	  });
+	  this.hitpoints -= damage;
+	};
+	
+	module.exports = Fighter;
+
+
+/***/ },
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Fighter = __webpack_require__(5);
+	var Fighter = __webpack_require__(14);
 	
 	var fighter = new Fighter ({
 	  name: "Kannuki",

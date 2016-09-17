@@ -47,9 +47,6 @@ Player.prototype.executeCommand = function (verb, noun) {
     return undefined;
   } else {
     this.display("");
-    console.log('!');
-    console.log(this.location.getNoun(noun));
-    console.log('!');
     if (this.location.getNoun(noun)) {
       noun = this.location.getNoun(noun);
     } else if (this.getInventoryNoun(noun)) {
@@ -100,8 +97,6 @@ Player.prototype.executeCommand = function (verb, noun) {
   };
 
   Player.prototype.engage = function (opponent, move, response) {
-    console.log("Engaged");
-    console.log(this.book.describeFight);
     this.book.describeFight(this, opponent);
     var damage = 0;
     var damageTypes = ['cut', 'stab', 'crush', 'blast'];
@@ -111,9 +106,7 @@ Player.prototype.executeCommand = function (verb, noun) {
       0 : (move.attack[type] - response.defense[type]);
     });
 
-    console.log(this.hitpoints);
     this.hitpoints -= damage;
-    console.log(this.hitpoints);
   };
 };
 

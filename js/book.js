@@ -77,21 +77,51 @@ Book.prototype.describeFight = function (player, opponent) {
   };
   this.playerWindow.className = 'fight-window';
   this.input.blur();
-  this.scrollDown(14);
-  console.log("Player move:");
-  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.moves[0]);
-  console.log(fight.opponent);
-  console.log(fight.opponent.moves[0]);
-  this.playerWindow.innerHTML += this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
-  console.log('Populated window with fighter data.');
-  // console.log(fight.player);
-  // console.log(this.playerWindow.innerHTML);
+  this.scrollDown(16);
+  fight.player.currentMove = {
+    index: 0,
+    data: player.moves[0],
+  };
+  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
   // this.playerWindow.innerHTML = '<ul>';
   // this.playerWindow.innerHTML += '<li>' + fight.player.name + '</li><li>' + fight.player.moves[0].name + '</li>';
   // this.playerWindow.innerHTML += '<li>' + fight.opponent.name + '</li>';
   // this.playerWindow.innerHTML += '<ul>';
-  var fightText = fight.player.name + "\n" + "";
-  this.areaWindow.innerHTML = fightText;
+  this.setUpFightControls(fight);
+};
+
+Book.prototype.setUpFightControls = function (fight) {
+  var left; var right; var slideLeft; var slideRight; var player;
+  player = fight.player;
+  left = document.getElementsByClassName('move-lefty')[0];
+  right = document.getElementsByClassName('move-righty')[0];
+  slideLeft = function () {
+    player.currentMove.index -= 1;
+    if (player.currentMove.index < 0) {
+      player.currentMove.index = player.moves.length-1;
+    }
+    player.currentMove.data = player.moves[player.currentMove.index];
+    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+  }.bind(this);
+  slideRight = function () {
+    player.currentMove.index += 1;
+    if (player.currentMove.index >= player.moves.length) {
+      player.currentMove.index = 0;
+    }
+    player.currentMove.data = player.moves[player.currentMove.index];
+    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
+    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+  }.bind(this);
+  window.onkeydown = function (event) {
+    if (event.key == 'ArrowLeft') {
+      slideLeft();
+    }
+    if (event.key == 'ArrowRight') {
+      slideRight();
+    }
+  };
 };
 
 Book.prototype.printFightMove = function (move) {
