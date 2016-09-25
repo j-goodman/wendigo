@@ -17,6 +17,12 @@ var fighter = new Fighter ({
     this.location.getNouns();
     var door = this.location.getNoun('far door');
     door.locked = false;
+    var table = this.location.getNoun('near door').getDestination().getNoun('other table');
+    var corpse = this.location.getNoun('near door').getDestination().getNoun('dead man');
+    table.checkText = 'Like its twin, this one is made of a cool, light, smooth wood.';
+    corpse.name = '';
+    corpse.description = '';
+
   },
   moves: [
     {

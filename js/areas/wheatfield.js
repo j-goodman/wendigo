@@ -20,7 +20,7 @@ area = new Area ({
     }),
     new Exit ({
       name: "near door",
-      description: "The green door back in to the farmhouse is behind you.",
+      description: "The near door back in to the farmhouse is behind you.",
       checkText: "A green door. You can use it to go to the farmhouse interior again.",
       destinationName: 'farmhouse',
       verbs: ["check", "go to"],

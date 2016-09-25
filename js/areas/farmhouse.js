@@ -40,7 +40,7 @@ area = new Area ({
       verbs: ["check"],
 
       onCheck: function () {
-        this.description = "There is a wooden table in the middle of the room.";
+        this.description = "There is a wooden table in the middle of the room. If you want to know more about the table, you can check it.";
       },
     }),
     new Feature ({
@@ -91,9 +91,9 @@ area = new Area ({
     }),
 
     new Item ({
-      name: "sword",
-      checkText: "A sword. You can get it if you want it.",
-      description: "There is a sword leaning beside it.",
+      name: "machete",
+      checkText: "A machete. You can get it if you want it.",
+      description: "There is a machete leaning beside it.",
       moves: [
         {
           name: 'forward thrust',
@@ -129,7 +129,7 @@ area = new Area ({
       verbs: ["check", "get"],
 
       onGet: function () {
-        this.checkText = "A sword. Use it to defend yourself, or to <v>attack</v>.";
+        this.checkText = "A machete. It can be used to block as well as to attack, so it will protect you from cutting (<v>♦</v>) and stabbing (<v>♠</v>) damage while inflicting the same.";
       },
     }),
   ],

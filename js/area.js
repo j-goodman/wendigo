@@ -3,6 +3,7 @@ Area = function (args) {
   this.postscript = args.postscript;
   this.contents = args.contents;
   this.name = args.name;
+  this.onExit = args.onExit;
   this.worldMap = args.worldMap;
   this.getNouns = function () {
     var nouns = [];
@@ -38,6 +39,9 @@ Area = function (args) {
   }.bind(this);
   this.getNouns();
   this.getVerbs();
+  this.contents.forEach(function (feature) {
+    feature.location = this;
+  }.bind(this));
 };
 
 Area.prototype.getNoun = function (name) {

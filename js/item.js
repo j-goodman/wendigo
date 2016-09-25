@@ -18,7 +18,8 @@ Item.prototype["use"] = function (noun, player) {
 
 Item.prototype["get"] = function (noun, player) {
   if (!player.inventory.includes(noun)) {
-    var message = (noun.name + "</n>" + " added to your inventory.");
+    if (noun.onGet) { noun.onGet(); }
+    var message = (noun.name + "</n>" + " added to your inventory." + '</br></br>' + noun.checkText);
     var firstLetter = message.slice(0, 1);
     message = message.slice(1, message.length);
     message = '<n>' + firstLetter.toUpperCase() + message;
@@ -38,9 +39,6 @@ Item.prototype["get"] = function (noun, player) {
           }
         }
       }
-    }
-    if (noun.onGet) {
-      noun.onGet();
     }
     player.book.readArea(player.location);
   } else {

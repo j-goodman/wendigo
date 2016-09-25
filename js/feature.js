@@ -8,9 +8,7 @@ Feature = function (args) {
 
 Feature.prototype["check"] = function (noun, player) {
   player.display(noun.checkText);
-  if (noun.onCheck) {
-    noun.onCheck();
-  }
+  if (noun.onCheck) { noun.onCheck(); }
 };
 
 Feature.prototype["@"] = function (noun, player) {

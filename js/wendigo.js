@@ -84,6 +84,7 @@
 	  this.postscript = args.postscript;
 	  this.contents = args.contents;
 	  this.name = args.name;
+	  this.onExit = args.onExit;
 	  this.worldMap = args.worldMap;
 	  this.getNouns = function () {
 	    var nouns = [];
@@ -119,6 +120,9 @@
 	  }.bind(this);
 	  this.getNouns();
 	  this.getVerbs();
+	  this.contents.forEach(function (feature) {
+	    feature.location = this;
+	  }.bind(this));
 	};
 	
 	Area.prototype.getNoun = function (name) {
@@ -723,9 +727,7 @@
 	  if (!noun.locked) {
 	    var worldMap = __webpack_require__(6);
 	    player.location = worldMap[noun.destinationName];
-	    if (this.onExit) {
-	      this.onExit();
-	    }
+	    if (this.onExit) { this.onExit(); }
 	    player.enterArea();
 	  } else {
 	    return noun.lockCheck;
@@ -738,6 +740,11 @@
 	
 	Exit.prototype["@"] = function (noun, player) {
 	  Exit.prototype["go to"](noun, player);
+	};
+	
+	Exit.prototype.getDestination = function () {
+	  var worldMap = __webpack_require__(6);
+	  return worldMap[this.destinationName];
 	};
 	
 	module.exports = Exit;
@@ -757,9 +764,7 @@
 	
 	Feature.prototype["check"] = function (noun, player) {
 	  player.display(noun.checkText);
-	  if (noun.onCheck) {
-	    noun.onCheck();
-	  }
+	  if (noun.onCheck) { noun.onCheck(); }
 	};
 	
 	Feature.prototype["@"] = function (noun, player) {
@@ -838,7 +843,8 @@
 	
 	Item.prototype["get"] = function (noun, player) {
 	  if (!player.inventory.includes(noun)) {
-	    var message = (noun.name + "</n>" + " added to your inventory.");
+	    if (noun.onGet) { noun.onGet(); }
+	    var message = (noun.name + "</n>" + " added to your inventory." + '</br></br>' + noun.checkText);
 	    var firstLetter = message.slice(0, 1);
 	    message = message.slice(1, message.length);
 	    message = '<n>' + firstLetter.toUpperCase() + message;
@@ -858,9 +864,6 @@
 	          }
 	        }
 	      }
-	    }
-	    if (noun.onGet) {
-	      noun.onGet();
 	    }
 	    player.book.readArea(player.location);
 	  } else {
@@ -981,7 +984,7 @@
 	      verbs: ["check"],
 	
 	      onCheck: function () {
-	        this.description = "There is a wooden table in the middle of the room.";
+	        this.description = "There is a wooden table in the middle of the room. If you want to know more about the table, you can check it.";
 	      },
 	    }),
 	    new Feature ({
@@ -1032,9 +1035,9 @@
 	    }),
 	
 	    new Item ({
-	      name: "sword",
-	      checkText: "A sword. You can get it if you want it.",
-	      description: "There is a sword leaning beside it.",
+	      name: "machete",
+	      checkText: "A machete. You can get it if you want it.",
+	      description: "There is a machete leaning beside it.",
 	      moves: [
 	        {
 	          name: 'forward thrust',
@@ -1070,7 +1073,7 @@
 	      verbs: ["check", "get"],
 	
 	      onGet: function () {
-	        this.checkText = "A sword. Use it to defend yourself, or to <v>attack</v>.";
+	        this.checkText = "A machete. It can be used to block as well as to attack, so it will protect you from cutting (<v>♦</v>) and stabbing (<v>♠</v>) damage while inflicting the same.";
 	      },
 	    }),
 	  ],
@@ -1155,7 +1158,7 @@
 	    }),
 	    new Exit ({
 	      name: "near door",
-	      description: "The green door back in to the farmhouse is behind you.",
+	      description: "The near door back in to the farmhouse is behind you.",
 	      checkText: "A green door. You can use it to go to the farmhouse interior again.",
 	      destinationName: 'farmhouse',
 	      verbs: ["check", "go to"],
@@ -1203,6 +1206,12 @@
 	    this.location.getNouns();
 	    var door = this.location.getNoun('far door');
 	    door.locked = false;
+	    var table = this.location.getNoun('near door').getDestination().getNoun('other table');
+	    var corpse = this.location.getNoun('near door').getDestination().getNoun('dead man');
+	    table.checkText = 'Like its twin, this one is made of a cool, light, smooth wood.';
+	    corpse.name = '';
+	    corpse.description = '';
+	
 	  },
 	  moves: [
 	    {
