@@ -56,7 +56,10 @@ Player.prototype.executeCommand = function (verb, noun) {
     }
     if (noun[verb]) {
       verb = noun[verb];
-      verb(noun, this);
+      var exe = verb(noun, this);
+      if (exe) {
+        this.display(exe);
+      }
     } else {
       verbs = "";
       if (noun.verbs.length > 1) {
@@ -96,6 +99,10 @@ Player.prototype.executeCommand = function (verb, noun) {
 
   Player.prototype.haveFightDescribed = function (opponent, callback) {
     this.book.describeFight(this, opponent, callback);
+  };
+
+  Player.prototype.concludeFight = function () {
+    this.book.concludeFight();
   };
 
   Player.prototype.listMoves = function () {
@@ -140,7 +147,9 @@ Player.prototype.executeCommand = function (verb, noun) {
 
     this.hitpoints -= damage;
     var comment = 'You take ' + damage + ' damage and deal ' + dealtDamage + '.';
-    this.book.updateFightDisplay(this, opponent, comment);
+    if (this.hitpoints > 0 && opponent.hitpoints > 0) {
+      this.book.updateFightDisplay(this, opponent, comment);
+    }
   };
 };
 

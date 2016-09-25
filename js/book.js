@@ -65,6 +65,18 @@ Book.prototype.scrollDown = function (scrollDelta, diff) {
   }
 };
 
+Book.prototype.scrollUp = function (scrollDelta, diff) {
+  if (!diff) { diff = 1; }
+  var y = window.pageYOffset;
+  window.scrollTo(0, y-diff);
+  diff += 0.5;
+  if (diff < scrollDelta) {
+    window.setTimeout(function () {
+      this.scrollUp(scrollDelta, diff);
+    }.bind(this), 10);
+  }
+};
+
 Book.prototype.describeFight = function (player, opponent, callback) {
   player.listMoves();
   var fight = {
@@ -87,6 +99,15 @@ Book.prototype.describeFight = function (player, opponent, callback) {
   this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
   this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
   this.setUpFightControls(fight, callback);
+};
+
+Book.prototype.concludeFight = function () {
+  this.playerWindow.className = 'player-window';
+  this.scrollUp(18);
+  this.playerWindow.innerHTML = '';
+  this.unplugFightControls();
+  this.input.focus();
+  this.readArea(this.player.location);
 };
 
 Book.prototype.setUpFightControls = function (fight, callback) {
@@ -121,6 +142,10 @@ Book.prototype.setUpFightControls = function (fight, callback) {
       callback();
     }
   };
+};
+
+Book.prototype.unplugFightControls = function () {
+  window.onkeydown = null;
 };
 
 Book.prototype.updateFightDisplay = function (player, opponent, comment) {

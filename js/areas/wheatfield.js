@@ -19,16 +19,27 @@ area = new Area ({
       verbs: ["check"],
     }),
     new Exit ({
-      name: "door",
-      description: "The door back in to the farmhouse is behind you.",
+      name: "near door",
+      description: "The green door back in to the farmhouse is behind you.",
       checkText: "A green door. You can use it to go to the farmhouse interior again.",
       destinationName: 'farmhouse',
       verbs: ["check", "go to"],
+    }),
+    new Exit ({
+      name: "far door",
+      description: "There's a far door on the other side of the yard.",
+      checkText: "A heavy wooden door with a coat of chipped grey paint.",
+      destinationName: 'end',
+      verbs: ["check", "go to"],
+      locked: true,
+      lockCheck: "Kannuki is blocking the far door. You can't get past him."
     }),
 
     kannuki
 
   ],
 });
+
+kannuki.location = area;
 
 module.exports = area;

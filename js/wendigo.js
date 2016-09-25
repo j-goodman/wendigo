@@ -95,7 +95,7 @@
 	        }
 	      }
 	    }
-	    return nouns;
+	    this.nouns = nouns;
 	  }.bind(this);
 	  this.getVerbs = function () {
 	    var verbs = [];
@@ -115,10 +115,10 @@
 	        }
 	      }
 	    }
-	    return verbs;
+	    this.verbs = verbs;
 	  }.bind(this);
-	  this.nouns = this.getNouns();
-	  this.verbs = this.getVerbs();
+	  this.getNouns();
+	  this.getVerbs();
 	};
 	
 	Area.prototype.getNoun = function (name) {
@@ -212,6 +212,18 @@
 	  }
 	};
 	
+	Book.prototype.scrollUp = function (scrollDelta, diff) {
+	  if (!diff) { diff = 1; }
+	  var y = window.pageYOffset;
+	  window.scrollTo(0, y-diff);
+	  diff += 0.5;
+	  if (diff < scrollDelta) {
+	    window.setTimeout(function () {
+	      this.scrollUp(scrollDelta, diff);
+	    }.bind(this), 10);
+	  }
+	};
+	
 	Book.prototype.describeFight = function (player, opponent, callback) {
 	  player.listMoves();
 	  var fight = {
@@ -234,6 +246,15 @@
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
 	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  this.setUpFightControls(fight, callback);
+	};
+	
+	Book.prototype.concludeFight = function () {
+	  this.playerWindow.className = 'player-window';
+	  this.scrollUp(18);
+	  this.playerWindow.innerHTML = '';
+	  this.unplugFightControls();
+	  this.input.focus();
+	  this.readArea(this.player.location);
 	};
 	
 	Book.prototype.setUpFightControls = function (fight, callback) {
@@ -268,6 +289,10 @@
 	      callback();
 	    }
 	  };
+	};
+	
+	Book.prototype.unplugFightControls = function () {
+	  window.onkeydown = null;
 	};
 	
 	Book.prototype.updateFightDisplay = function (player, opponent, comment) {
@@ -398,7 +423,10 @@
 	    }
 	    if (noun[verb]) {
 	      verb = noun[verb];
-	      verb(noun, this);
+	      var exe = verb(noun, this);
+	      if (exe) {
+	        this.display(exe);
+	      }
 	    } else {
 	      verbs = "";
 	      if (noun.verbs.length > 1) {
@@ -438,6 +466,10 @@
 	
 	  Player.prototype.haveFightDescribed = function (opponent, callback) {
 	    this.book.describeFight(this, opponent, callback);
+	  };
+	
+	  Player.prototype.concludeFight = function () {
+	    this.book.concludeFight();
 	  };
 	
 	  Player.prototype.listMoves = function () {
@@ -482,7 +514,9 @@
 	
 	    this.hitpoints -= damage;
 	    var comment = 'You take ' + damage + ' damage and deal ' + dealtDamage + '.';
-	    this.book.updateFightDisplay(this, opponent, comment);
+	    if (this.hitpoints > 0 && opponent.hitpoints > 0) {
+	      this.book.updateFightDisplay(this, opponent, comment);
+	    }
 	  };
 	};
 	
@@ -572,6 +606,7 @@
 	  this.hitpoints = args.hitpoints;
 	  this.moves = args.moves;
 	  this.onFight = args.onFight;
+	  this.onDeath = args.onDeath;
 	};
 	
 	Fighter.prototype["check"] = function (noun, player) {
@@ -621,8 +656,11 @@
 	  }
 	};
 	
-	Fighter.prototype.die = function () {
-	  console.log("I've died!");
+	Fighter.prototype.die = function (opponent) {
+	  if (this.onDeath) {
+	    this.onDeath();
+	  }
+	  opponent.concludeFight();
 	};
 	
 	Fighter.prototype.engage = function (opponent, move, response) {
@@ -635,7 +673,7 @@
 	  });
 	  this.hitpoints -= damage;
 	  if (this.hitpoints < 0) {
-	    this.die();
+	    this.die(opponent);
 	  }
 	  if (opponent.hitpoints < 0) {
 	    opponent.die();
@@ -659,6 +697,7 @@
 	worldMap.studio = __webpack_require__(11);
 	worldMap.farmhouse = __webpack_require__(12);
 	worldMap.wheatfield = __webpack_require__(14);
+	worldMap.end = __webpack_require__(16);
 	
 	module.exports = worldMap;
 
@@ -676,16 +715,21 @@
 	  this.keyName = args.keyName;
 	  this.verbs = args.verbs;
 	  this.onExit = args.onExit;
+	  this.onTry = args.onTry;
 	  this.description = args.description;
 	};
 	
 	Exit.prototype["go to"] = function (noun, player) {
-	  var worldMap = __webpack_require__(6);
-	  player.location = worldMap[noun.destinationName];
-	  if (this.onExit) {
-	    this.onExit();
+	  if (!noun.locked) {
+	    var worldMap = __webpack_require__(6);
+	    player.location = worldMap[noun.destinationName];
+	    if (this.onExit) {
+	      this.onExit();
+	    }
+	    player.enterArea();
+	  } else {
+	    return noun.lockCheck;
 	  }
-	  player.enterArea();
 	};
 	
 	Exit.prototype["check"] = function (noun, player) {
@@ -1110,17 +1154,28 @@
 	      verbs: ["check"],
 	    }),
 	    new Exit ({
-	      name: "door",
-	      description: "The door back in to the farmhouse is behind you.",
+	      name: "near door",
+	      description: "The green door back in to the farmhouse is behind you.",
 	      checkText: "A green door. You can use it to go to the farmhouse interior again.",
 	      destinationName: 'farmhouse',
 	      verbs: ["check", "go to"],
+	    }),
+	    new Exit ({
+	      name: "far door",
+	      description: "There's a far door on the other side of the yard.",
+	      checkText: "A heavy wooden door with a coat of chipped grey paint.",
+	      destinationName: 'end',
+	      verbs: ["check", "go to"],
+	      locked: true,
+	      lockCheck: "Kannuki is blocking the far door. You can't get past him."
 	    }),
 	
 	    kannuki
 	
 	  ],
 	});
+	
+	kannuki.location = area;
 	
 	module.exports = area;
 
@@ -1133,7 +1188,7 @@
 	
 	var fighter = new Fighter ({
 	  name: "Kannuki",
-	  description: "An old man, Kannuki, stands facing you, holding a sword. He makes no move to attack.",
+	  description: "An old man, Kannuki, stands facing you, guarding the far door and holding a sword. He makes no move to attack.",
 	  checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
 	  verbs: ["check", "attack"],
 	  hitpoints: 100,
@@ -1141,6 +1196,14 @@
 	    window.alert('Use the left and right keys to see what moves you know, then use the spacebar to choose.');
 	    this.onFight = null;
 	  }.bind(this),
+	  onDeath: function () {
+	    this.name = "Kannuki's body";
+	    this.checkText = "The body of a tall whitehaired man, cut through with red slash wounds.";
+	    this.description = "Kannuki's body lies crumpled among the dust.";
+	    this.location.getNouns();
+	    var door = this.location.getNoun('far door');
+	    door.locked = false;
+	  },
 	  moves: [
 	    {
 	      name: 'cross cut',
@@ -1161,6 +1224,34 @@
 	});
 	
 	module.exports = fighter;
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Area = __webpack_require__(1);
+	var Feature = __webpack_require__(8);
+	var Box = __webpack_require__(13);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
+	
+	area = new Area ({
+	  description: "A vast empty white space. This is the end of the demo!",
+	  name: 'end',
+	  worldMap: this,
+	  contents: [
+	    new Exit ({
+	      name: "door",
+	      checkText: "A heavy wooden door with a coat of chipped grey paint.",
+	      description: "The door is behind you.",
+	      destinationName: 'wheatfield',
+	      verbs: ["check", "go to"],
+	    }),
+	  ],
+	});
+	
+	module.exports = area;
 
 
 /***/ }
