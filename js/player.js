@@ -56,7 +56,10 @@ Player.prototype.executeCommand = function (verb, noun) {
     }
     if (noun[verb]) {
       verb = noun[verb];
-      verb(noun, this);
+      var exe = verb(noun, this);
+      if (exe) {
+        this.display(exe);
+      }
     } else {
       verbs = "";
       if (noun.verbs.length > 1) {

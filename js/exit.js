@@ -7,16 +7,21 @@ Exit = function (args) {
   this.keyName = args.keyName;
   this.verbs = args.verbs;
   this.onExit = args.onExit;
+  this.onTry = args.onTry;
   this.description = args.description;
 };
 
 Exit.prototype["go to"] = function (noun, player) {
-  var worldMap = require("./world.js");
-  player.location = worldMap[noun.destinationName];
-  if (this.onExit) {
-    this.onExit();
+  if (!noun.locked) {
+    var worldMap = require("./world.js");
+    player.location = worldMap[noun.destinationName];
+    if (this.onExit) {
+      this.onExit();
+    }
+    player.enterArea();
+  } else {
+    return noun.lockCheck;
   }
-  player.enterArea();
 };
 
 Exit.prototype["check"] = function (noun, player) {

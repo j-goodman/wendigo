@@ -423,7 +423,10 @@
 	    }
 	    if (noun[verb]) {
 	      verb = noun[verb];
-	      verb(noun, this);
+	      var exe = verb(noun, this);
+	      if (exe) {
+	        this.display(exe);
+	      }
 	    } else {
 	      verbs = "";
 	      if (noun.verbs.length > 1) {
@@ -694,6 +697,7 @@
 	worldMap.studio = __webpack_require__(11);
 	worldMap.farmhouse = __webpack_require__(12);
 	worldMap.wheatfield = __webpack_require__(14);
+	worldMap.end = __webpack_require__(16);
 	
 	module.exports = worldMap;
 
@@ -711,16 +715,21 @@
 	  this.keyName = args.keyName;
 	  this.verbs = args.verbs;
 	  this.onExit = args.onExit;
+	  this.onTry = args.onTry;
 	  this.description = args.description;
 	};
 	
 	Exit.prototype["go to"] = function (noun, player) {
-	  var worldMap = __webpack_require__(6);
-	  player.location = worldMap[noun.destinationName];
-	  if (this.onExit) {
-	    this.onExit();
+	  if (!noun.locked) {
+	    var worldMap = __webpack_require__(6);
+	    player.location = worldMap[noun.destinationName];
+	    if (this.onExit) {
+	      this.onExit();
+	    }
+	    player.enterArea();
+	  } else {
+	    return noun.lockCheck;
 	  }
-	  player.enterArea();
 	};
 	
 	Exit.prototype["check"] = function (noun, player) {
@@ -1145,11 +1154,20 @@
 	      verbs: ["check"],
 	    }),
 	    new Exit ({
-	      name: "door",
-	      description: "The door back in to the farmhouse is behind you.",
+	      name: "near door",
+	      description: "The green door back in to the farmhouse is behind you.",
 	      checkText: "A green door. You can use it to go to the farmhouse interior again.",
 	      destinationName: 'farmhouse',
 	      verbs: ["check", "go to"],
+	    }),
+	    new Exit ({
+	      name: "far door",
+	      description: "There's a far door on the other side of the yard.",
+	      checkText: "A heavy wooden door with a coat of chipped grey paint.",
+	      destinationName: 'end',
+	      verbs: ["check", "go to"],
+	      locked: true,
+	      lockCheck: "Kannuki is blocking the far door. You can't get past him."
 	    }),
 	
 	    kannuki
@@ -1170,7 +1188,7 @@
 	
 	var fighter = new Fighter ({
 	  name: "Kannuki",
-	  description: "An old man, Kannuki, stands facing you, holding a sword. He makes no move to attack.",
+	  description: "An old man, Kannuki, stands facing you, guarding the far door and holding a sword. He makes no move to attack.",
 	  checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
 	  verbs: ["check", "attack"],
 	  hitpoints: 100,
@@ -1183,6 +1201,8 @@
 	    this.checkText = "The body of a tall whitehaired man, cut through with red slash wounds.";
 	    this.description = "Kannuki's body lies crumpled among the dust.";
 	    this.location.getNouns();
+	    var door = this.location.getNoun('far door');
+	    door.locked = false;
 	  },
 	  moves: [
 	    {
@@ -1204,6 +1224,34 @@
 	});
 	
 	module.exports = fighter;
+
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Area = __webpack_require__(1);
+	var Feature = __webpack_require__(8);
+	var Box = __webpack_require__(13);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
+	
+	area = new Area ({
+	  description: "A vast empty white space. This is the end of the demo!",
+	  name: 'end',
+	  worldMap: this,
+	  contents: [
+	    new Exit ({
+	      name: "door",
+	      checkText: "A heavy wooden door with a coat of chipped grey paint.",
+	      description: "The door is behind you.",
+	      destinationName: 'wheatfield',
+	      verbs: ["check", "go to"],
+	    }),
+	  ],
+	});
+	
+	module.exports = area;
 
 
 /***/ }
