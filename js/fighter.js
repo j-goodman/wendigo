@@ -7,6 +7,7 @@ Fighter = function (args) {
   this.hitpoints = args.hitpoints;
   this.moves = args.moves;
   this.onFight = args.onFight;
+  this.onDeath = args.onDeath;
 };
 
 Fighter.prototype["check"] = function (noun, player) {
@@ -56,8 +57,11 @@ Fighter.prototype.isAttacked = function (opponent, move) {
   }
 };
 
-Fighter.prototype.die = function () {
-  console.log("I've died!");
+Fighter.prototype.die = function (opponent) {
+  if (this.onDeath) {
+    this.onDeath();
+  }
+  opponent.concludeFight();
 };
 
 Fighter.prototype.engage = function (opponent, move, response) {
@@ -70,7 +74,7 @@ Fighter.prototype.engage = function (opponent, move, response) {
   });
   this.hitpoints -= damage;
   if (this.hitpoints < 0) {
-    this.die();
+    this.die(opponent);
   }
   if (opponent.hitpoints < 0) {
     opponent.die();

@@ -10,6 +10,12 @@ var fighter = new Fighter ({
     window.alert('Use the left and right keys to see what moves you know, then use the spacebar to choose.');
     this.onFight = null;
   }.bind(this),
+  onDeath: function () {
+    this.name = "Kannuki's body";
+    this.checkText = "The body of a tall whitehaired man, cut through with red slash wounds.";
+    this.description = "Kannuki's body lies crumpled among the dust.";
+    this.location.getNouns();
+  },
   moves: [
     {
       name: 'cross cut',

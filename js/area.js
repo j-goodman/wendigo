@@ -14,7 +14,7 @@ Area = function (args) {
         }
       }
     }
-    return nouns;
+    this.nouns = nouns;
   }.bind(this);
   this.getVerbs = function () {
     var verbs = [];
@@ -34,10 +34,10 @@ Area = function (args) {
         }
       }
     }
-    return verbs;
+    this.verbs = verbs;
   }.bind(this);
-  this.nouns = this.getNouns();
-  this.verbs = this.getVerbs();
+  this.getNouns();
+  this.getVerbs();
 };
 
 Area.prototype.getNoun = function (name) {

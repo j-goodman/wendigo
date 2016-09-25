@@ -31,4 +31,6 @@ area = new Area ({
   ],
 });
 
+kannuki.location = area;
+
 module.exports = area;

@@ -95,7 +95,7 @@
 	        }
 	      }
 	    }
-	    return nouns;
+	    this.nouns = nouns;
 	  }.bind(this);
 	  this.getVerbs = function () {
 	    var verbs = [];
@@ -115,10 +115,10 @@
 	        }
 	      }
 	    }
-	    return verbs;
+	    this.verbs = verbs;
 	  }.bind(this);
-	  this.nouns = this.getNouns();
-	  this.verbs = this.getVerbs();
+	  this.getNouns();
+	  this.getVerbs();
 	};
 	
 	Area.prototype.getNoun = function (name) {
@@ -212,6 +212,18 @@
 	  }
 	};
 	
+	Book.prototype.scrollUp = function (scrollDelta, diff) {
+	  if (!diff) { diff = 1; }
+	  var y = window.pageYOffset;
+	  window.scrollTo(0, y-diff);
+	  diff += 0.5;
+	  if (diff < scrollDelta) {
+	    window.setTimeout(function () {
+	      this.scrollUp(scrollDelta, diff);
+	    }.bind(this), 10);
+	  }
+	};
+	
 	Book.prototype.describeFight = function (player, opponent, callback) {
 	  player.listMoves();
 	  var fight = {
@@ -234,6 +246,15 @@
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
 	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  this.setUpFightControls(fight, callback);
+	};
+	
+	Book.prototype.concludeFight = function () {
+	  this.playerWindow.className = 'player-window';
+	  this.scrollUp(18);
+	  this.playerWindow.innerHTML = '';
+	  this.unplugFightControls();
+	  this.input.focus();
+	  this.readArea(this.player.location);
 	};
 	
 	Book.prototype.setUpFightControls = function (fight, callback) {
@@ -268,6 +289,10 @@
 	      callback();
 	    }
 	  };
+	};
+	
+	Book.prototype.unplugFightControls = function () {
+	  window.onkeydown = null;
 	};
 	
 	Book.prototype.updateFightDisplay = function (player, opponent, comment) {
@@ -440,6 +465,10 @@
 	    this.book.describeFight(this, opponent, callback);
 	  };
 	
+	  Player.prototype.concludeFight = function () {
+	    this.book.concludeFight();
+	  };
+	
 	  Player.prototype.listMoves = function () {
 	    this.moves = [
 	      {
@@ -482,7 +511,9 @@
 	
 	    this.hitpoints -= damage;
 	    var comment = 'You take ' + damage + ' damage and deal ' + dealtDamage + '.';
-	    this.book.updateFightDisplay(this, opponent, comment);
+	    if (this.hitpoints > 0 && opponent.hitpoints > 0) {
+	      this.book.updateFightDisplay(this, opponent, comment);
+	    }
 	  };
 	};
 	
@@ -572,6 +603,7 @@
 	  this.hitpoints = args.hitpoints;
 	  this.moves = args.moves;
 	  this.onFight = args.onFight;
+	  this.onDeath = args.onDeath;
 	};
 	
 	Fighter.prototype["check"] = function (noun, player) {
@@ -621,8 +653,11 @@
 	  }
 	};
 	
-	Fighter.prototype.die = function () {
-	  console.log("I've died!");
+	Fighter.prototype.die = function (opponent) {
+	  if (this.onDeath) {
+	    this.onDeath();
+	  }
+	  opponent.concludeFight();
 	};
 	
 	Fighter.prototype.engage = function (opponent, move, response) {
@@ -635,7 +670,7 @@
 	  });
 	  this.hitpoints -= damage;
 	  if (this.hitpoints < 0) {
-	    this.die();
+	    this.die(opponent);
 	  }
 	  if (opponent.hitpoints < 0) {
 	    opponent.die();
@@ -1122,6 +1157,8 @@
 	  ],
 	});
 	
+	kannuki.location = area;
+	
 	module.exports = area;
 
 
@@ -1141,6 +1178,12 @@
 	    window.alert('Use the left and right keys to see what moves you know, then use the spacebar to choose.');
 	    this.onFight = null;
 	  }.bind(this),
+	  onDeath: function () {
+	    this.name = "Kannuki's body";
+	    this.checkText = "The body of a tall whitehaired man, cut through with red slash wounds.";
+	    this.description = "Kannuki's body lies crumpled among the dust.";
+	    this.location.getNouns();
+	  },
 	  moves: [
 	    {
 	      name: 'cross cut',

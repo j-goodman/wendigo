@@ -98,6 +98,10 @@ Player.prototype.executeCommand = function (verb, noun) {
     this.book.describeFight(this, opponent, callback);
   };
 
+  Player.prototype.concludeFight = function () {
+    this.book.concludeFight();
+  };
+
   Player.prototype.listMoves = function () {
     this.moves = [
       {
@@ -140,7 +144,9 @@ Player.prototype.executeCommand = function (verb, noun) {
 
     this.hitpoints -= damage;
     var comment = 'You take ' + damage + ' damage and deal ' + dealtDamage + '.';
-    this.book.updateFightDisplay(this, opponent, comment);
+    if (this.hitpoints > 0 && opponent.hitpoints > 0) {
+      this.book.updateFightDisplay(this, opponent, comment);
+    }
   };
 };
 
