@@ -65,53 +65,7 @@
 	      highlighter: 'highlighter',
 	    }),
 	    name: 'Sanjuro',
-	    moves: [
-	      {
-	        name: 'forward thrust',
-	        attack: {
-	          cut: 0,
-	          stab: 24,
-	          crush: 0,
-	          blast: 0,
-	        },
-	        defense: {
-	          cut: 12,
-	          stab: 3,
-	          crush: 6,
-	          blast: 0,
-	        },
-	      },
-	      {
-	        name: 'cross cut',
-	        attack: {
-	          cut: 24,
-	          stab: 0,
-	          crush: 0,
-	          blast: 0,
-	        },
-	        defense: {
-	          cut: 12,
-	          stab: 3,
-	          crush: 3,
-	          blast: 0,
-	        },
-	      },
-	      {
-	        name: 'cautious feint',
-	        attack: {
-	          cut: 5,
-	          stab: 5,
-	          crush: 0,
-	          blast: 0,
-	        },
-	        defense: {
-	          cut: 18,
-	          stab: 18,
-	          crush: 0,
-	          blast: 0,
-	        },
-	      },
-	    ],
+	    moves: [],
 	    hitpoints: 100,
 	    spawnpoint: 'farmhouse',
 	    worldMap: game.worldMap,
@@ -202,6 +156,7 @@
 	  this.player = args.player;
 	  this.fightScreen = false;
 	  this.fightDisplay = fight_display;
+	  this.fightComment = 'vs.';
 	};
 	
 	Book.prototype.init = function () {
@@ -258,6 +213,7 @@
 	};
 	
 	Book.prototype.describeFight = function (player, opponent, callback) {
+	  player.listMoves();
 	  var fight = {
 	    player: player,
 	    opponent: opponent,
@@ -276,7 +232,7 @@
 	    data: player.moves[0],
 	  };
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  this.setUpFightControls(fight, callback);
 	};
 	
@@ -290,7 +246,7 @@
 	    }
 	    player.currentMove.data = player.moves[player.currentMove.index];
 	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  }.bind(this);
 	  slideRight = function () {
 	    player.currentMove.index += 1;
@@ -299,7 +255,7 @@
 	    }
 	    player.currentMove.data = player.moves[player.currentMove.index];
 	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  }.bind(this);
 	  window.onkeydown = function (event) {
 	    if (event.key == 'ArrowLeft') {
@@ -314,9 +270,10 @@
 	  };
 	};
 	
-	Book.prototype.updateFightDisplay = function (player, opponent) {
+	Book.prototype.updateFightDisplay = function (player, opponent, comment) {
+	  this.fightComment = comment;
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
+	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
 	};
 	
 	Book.prototype.printFightMove = function (move) {
@@ -483,6 +440,31 @@
 	    this.book.describeFight(this, opponent, callback);
 	  };
 	
+	  Player.prototype.listMoves = function () {
+	    this.moves = [
+	      {
+	        name: 'punch',
+	        attack: {
+	          cut: 0,
+	          stab: 0,
+	          crush: 7,
+	          blast: 0,
+	        },
+	        defense: {
+	          cut: 0,
+	          stab: 0,
+	          crush: 1,
+	          blast: 0,
+	        },
+	      },
+	    ];
+	    for (var ii=0; ii < this.inventory.length; ii++) {
+	      if (this.inventory[ii].moves) {
+	        this.moves = this.moves.concat(this.inventory[ii].moves);
+	      }
+	    }
+	  };
+	
 	  Player.prototype.engage = function (opponent, move, response) {
 	    var damage = 0;
 	    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
@@ -492,9 +474,22 @@
 	      0 : (move.attack[type] - response.defense[type]);
 	    });
 	
+	    var dealtDamage = 0;
+	    damageTypes.forEach(function (type) {
+	      dealtDamage += (response.attack[type] - move.defense[type]) < 0 ?
+	      0 : (response.attack[type] - move.defense[type]);
+	    });
+	
 	    this.hitpoints -= damage;
-	    this.book.updateFightDisplay(this, opponent);
+	    var comment = 'You take ' + damage + ' damage and deal ' + dealtDamage + '.';
+	    this.book.updateFightDisplay(this, opponent, comment);
 	  };
+	};
+	
+	Player.prototype.die = function () {
+	  window.alert("You've died.");
+	  window.scrollTo(0, 0);
+	  location.reload();
 	};
 	
 	Player.prototype.getInventoryNoun = function (name) {
@@ -626,6 +621,10 @@
 	  }
 	};
 	
+	Fighter.prototype.die = function () {
+	  console.log("I've died!");
+	};
+	
 	Fighter.prototype.engage = function (opponent, move, response) {
 	  var damage = 0;
 	  var damageTypes = ['cut', 'stab', 'crush', 'blast'];
@@ -636,10 +635,10 @@
 	  });
 	  this.hitpoints -= damage;
 	  if (this.hitpoints < 0) {
-	    window.alert("You beat Kannuki! The game is only a demo right now -- that's all we've got so far.");
+	    this.die();
 	  }
 	  if (opponent.hitpoints < 0) {
-	    window.alert("Kannuki killed you! The game is only a demo right now -- that's all we've got so far.");
+	    opponent.die();
 	  }
 	};
 	
@@ -781,6 +780,7 @@
 	  this.verbs = args.verbs;
 	  this.description = args.description;
 	  this.onGet = args.onGet;
+	  this.moves = args.moves;
 	};
 	
 	Item.prototype["check"] = function (noun, player) {
@@ -964,7 +964,7 @@
 	        }),
 	        new Item ({
 	          name: "keys",
-	          checkText: "An aluminium ring of keys with a small silver key on it and a larger black car key.",
+	          checkText: "An aluminium ring of keys with a small silver key on it and a larger brass key.",
 	          description: "a set of keys",
 	          verbs: ["check", "get"],
 	        }),
@@ -991,6 +991,38 @@
 	      name: "sword",
 	      checkText: "A sword. You can get it if you want it.",
 	      description: "There is a sword leaning beside it.",
+	      moves: [
+	        {
+	          name: 'forward thrust',
+	          attack: {
+	            cut: 0,
+	            stab: 24,
+	            crush: 0,
+	            blast: 0,
+	          },
+	          defense: {
+	            cut: 12,
+	            stab: 0,
+	            crush: 6,
+	            blast: 0,
+	          },
+	        },
+	        {
+	          name: 'cross cut',
+	          attack: {
+	            cut: 24,
+	            stab: 0,
+	            crush: 0,
+	            blast: 0,
+	          },
+	          defense: {
+	            cut: 12,
+	            stab: 3,
+	            crush: 3,
+	            blast: 0,
+	          },
+	        },
+	      ],
 	      verbs: ["check", "get"],
 	
 	      onGet: function () {

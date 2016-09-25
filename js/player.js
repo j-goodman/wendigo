@@ -98,6 +98,31 @@ Player.prototype.executeCommand = function (verb, noun) {
     this.book.describeFight(this, opponent, callback);
   };
 
+  Player.prototype.listMoves = function () {
+    this.moves = [
+      {
+        name: 'punch',
+        attack: {
+          cut: 0,
+          stab: 0,
+          crush: 7,
+          blast: 0,
+        },
+        defense: {
+          cut: 0,
+          stab: 0,
+          crush: 1,
+          blast: 0,
+        },
+      },
+    ];
+    for (var ii=0; ii < this.inventory.length; ii++) {
+      if (this.inventory[ii].moves) {
+        this.moves = this.moves.concat(this.inventory[ii].moves);
+      }
+    }
+  };
+
   Player.prototype.engage = function (opponent, move, response) {
     var damage = 0;
     var damageTypes = ['cut', 'stab', 'crush', 'blast'];
@@ -107,9 +132,22 @@ Player.prototype.executeCommand = function (verb, noun) {
       0 : (move.attack[type] - response.defense[type]);
     });
 
+    var dealtDamage = 0;
+    damageTypes.forEach(function (type) {
+      dealtDamage += (response.attack[type] - move.defense[type]) < 0 ?
+      0 : (response.attack[type] - move.defense[type]);
+    });
+
     this.hitpoints -= damage;
-    this.book.updateFightDisplay(this, opponent);
+    var comment = 'You take ' + damage + ' damage and deal ' + dealtDamage + '.';
+    this.book.updateFightDisplay(this, opponent, comment);
   };
+};
+
+Player.prototype.die = function () {
+  window.alert("You've died.");
+  window.scrollTo(0, 0);
+  location.reload();
 };
 
 Player.prototype.getInventoryNoun = function (name) {
