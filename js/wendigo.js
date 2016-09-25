@@ -47,7 +47,7 @@
 	var Area = __webpack_require__(1);
 	var Book = __webpack_require__(2);
 	var Player = __webpack_require__(4);
-	var worldMap = __webpack_require__(5);
+	var worldMap = __webpack_require__(6);
 	
 	window.onload = function () {
 	  init();
@@ -65,53 +65,7 @@
 	      highlighter: 'highlighter',
 	    }),
 	    name: 'Sanjuro',
-	    moves: [
-	      {
-	        name: 'forward thrust',
-	        attack: {
-	          cut: 0,
-	          stab: 24,
-	          crush: 0,
-	          blast: 0,
-	        },
-	        defense: {
-	          cut: 12,
-	          stab: 3,
-	          crush: 6,
-	          blast: 0,
-	        },
-	      },
-	      {
-	        name: 'cross cut',
-	        attack: {
-	          cut: 24,
-	          stab: 0,
-	          crush: 0,
-	          blast: 0,
-	        },
-	        defense: {
-	          cut: 12,
-	          stab: 3,
-	          crush: 3,
-	          blast: 0,
-	        },
-	      },
-	      {
-	        name: 'cautious feint',
-	        attack: {
-	          cut: 5,
-	          stab: 5,
-	          crush: 0,
-	          blast: 0,
-	        },
-	        defense: {
-	          cut: 18,
-	          stab: 18,
-	          crush: 0,
-	          blast: 0,
-	        },
-	      },
-	    ],
+	    moves: [],
 	    hitpoints: 100,
 	    spawnpoint: 'farmhouse',
 	    worldMap: game.worldMap,
@@ -202,6 +156,7 @@
 	  this.player = args.player;
 	  this.fightScreen = false;
 	  this.fightDisplay = fight_display;
+	  this.fightComment = 'vs.';
 	};
 	
 	Book.prototype.init = function () {
@@ -258,6 +213,7 @@
 	};
 	
 	Book.prototype.describeFight = function (player, opponent, callback) {
+	  player.listMoves();
 	  var fight = {
 	    player: player,
 	    opponent: opponent,
@@ -276,7 +232,7 @@
 	    data: player.moves[0],
 	  };
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  this.setUpFightControls(fight, callback);
 	};
 	
@@ -290,7 +246,7 @@
 	    }
 	    player.currentMove.data = player.moves[player.currentMove.index];
 	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  }.bind(this);
 	  slideRight = function () {
 	    player.currentMove.index += 1;
@@ -299,7 +255,7 @@
 	    }
 	    player.currentMove.data = player.moves[player.currentMove.index];
 	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	    this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
 	  }.bind(this);
 	  window.onkeydown = function (event) {
 	    if (event.key == 'ArrowLeft') {
@@ -314,9 +270,10 @@
 	  };
 	};
 	
-	Book.prototype.updateFightDisplay = function (player, opponent) {
+	Book.prototype.updateFightDisplay = function (player, opponent, comment) {
+	  this.fightComment = comment;
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	  this.playerWindow.innerHTML += '<br><div>vs.</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
+	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
 	};
 	
 	Book.prototype.printFightMove = function (move) {
@@ -383,7 +340,7 @@
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Fighter = __webpack_require__(14);
+	var Fighter = __webpack_require__(5);
 	
 	Player = function (args) {
 	  this.name = args.name;
@@ -483,6 +440,31 @@
 	    this.book.describeFight(this, opponent, callback);
 	  };
 	
+	  Player.prototype.listMoves = function () {
+	    this.moves = [
+	      {
+	        name: 'punch',
+	        attack: {
+	          cut: 0,
+	          stab: 0,
+	          crush: 7,
+	          blast: 0,
+	        },
+	        defense: {
+	          cut: 0,
+	          stab: 0,
+	          crush: 1,
+	          blast: 0,
+	        },
+	      },
+	    ];
+	    for (var ii=0; ii < this.inventory.length; ii++) {
+	      if (this.inventory[ii].moves) {
+	        this.moves = this.moves.concat(this.inventory[ii].moves);
+	      }
+	    }
+	  };
+	
 	  Player.prototype.engage = function (opponent, move, response) {
 	    var damage = 0;
 	    var damageTypes = ['cut', 'stab', 'crush', 'blast'];
@@ -492,9 +474,22 @@
 	      0 : (move.attack[type] - response.defense[type]);
 	    });
 	
+	    var dealtDamage = 0;
+	    damageTypes.forEach(function (type) {
+	      dealtDamage += (response.attack[type] - move.defense[type]) < 0 ?
+	      0 : (response.attack[type] - move.defense[type]);
+	    });
+	
 	    this.hitpoints -= damage;
-	    this.book.updateFightDisplay(this, opponent);
+	    var comment = 'You take ' + damage + ' damage and deal ' + dealtDamage + '.';
+	    this.book.updateFightDisplay(this, opponent, comment);
 	  };
+	};
+	
+	Player.prototype.die = function () {
+	  window.alert("You've died.");
+	  window.scrollTo(0, 0);
+	  location.reload();
 	};
 	
 	Player.prototype.getInventoryNoun = function (name) {
@@ -566,24 +561,110 @@
 
 /***/ },
 /* 5 */
+/***/ function(module, exports) {
+
+	/*jshint sub:true*/
+	Fighter = function (args) {
+	  this.checkText = args.checkText;
+	  this.name = args.name;
+	  this.verbs = args.verbs;
+	  this.description = args.description;
+	  this.hitpoints = args.hitpoints;
+	  this.moves = args.moves;
+	  this.onFight = args.onFight;
+	};
+	
+	Fighter.prototype["check"] = function (noun, player) {
+	  player.display(noun.checkText);
+	  if (this.onCheck) {
+	    this.onCheck();
+	  }
+	};
+	
+	Fighter.prototype["attack"] = function (noun, player) {
+	  player.getMove(noun);
+	};
+	
+	Fighter.prototype.startFight = function (target) {
+	  var move = this.chooseMove();
+	  target.isAttacked(this, move);
+	};
+	
+	Fighter.prototype.chooseMove = function (attackerMove) {
+	  return this.moves[0];
+	  // Move decision logic will be based on data in the Fighter's memory object
+	  // about what has been most effective in the past.
+	};
+	
+	Fighter.prototype.hitpointsString = function () {
+	  var string = "";
+	  for (var x = 0; x < this.hitpoints; x+=3) {
+	    string += "█";
+	  }
+	  if (string.length < this.hitpoints/3) {
+	    string += "▌";
+	  }
+	  return string;
+	};
+	
+	Fighter.prototype.isAttacked = function (opponent, move) {
+	  if (this.onFight) {
+	    this.onFight();
+	  }
+	  var response = this.chooseMove(move);
+	  // The Fighter will sometimes flee, otherwise they attack
+	  if (opponent.haveFightDescribed) {
+	    opponent.haveFightDescribed(this, function () {
+	      this.engage(opponent, opponent.currentMove.data, response);
+	      opponent.engage(this, response, opponent.currentMove.data);
+	    }.bind(this));
+	  }
+	};
+	
+	Fighter.prototype.die = function () {
+	  console.log("I've died!");
+	};
+	
+	Fighter.prototype.engage = function (opponent, move, response) {
+	  var damage = 0;
+	  var damageTypes = ['cut', 'stab', 'crush', 'blast'];
+	
+	  damageTypes.forEach(function (type) {
+	    damage += (move.attack[type] - response.defense[type]) < 0 ?
+	    0 : (move.attack[type] - response.defense[type]);
+	  });
+	  this.hitpoints -= damage;
+	  if (this.hitpoints < 0) {
+	    this.die();
+	  }
+	  if (opponent.hitpoints < 0) {
+	    opponent.die();
+	  }
+	};
+	
+	module.exports = Fighter;
+
+
+/***/ },
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Exit = __webpack_require__(6);
-	var Feature = __webpack_require__(7);
+	var Exit = __webpack_require__(7);
+	var Feature = __webpack_require__(8);
 	
 	var worldMap = {};
 	
-	worldMap.backroom = __webpack_require__(8);
-	worldMap.studio = __webpack_require__(10);
-	worldMap.farmhouse = __webpack_require__(11);
-	worldMap.wheatfield = __webpack_require__(13);
+	worldMap.backroom = __webpack_require__(9);
+	worldMap.studio = __webpack_require__(11);
+	worldMap.farmhouse = __webpack_require__(12);
+	worldMap.wheatfield = __webpack_require__(14);
 	
 	module.exports = worldMap;
 
 
 /***/ },
-/* 6 */
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	Exit = function (args) {
@@ -599,7 +680,7 @@
 	};
 	
 	Exit.prototype["go to"] = function (noun, player) {
-	  var worldMap = __webpack_require__(5);
+	  var worldMap = __webpack_require__(6);
 	  player.location = worldMap[noun.destinationName];
 	  if (this.onExit) {
 	    this.onExit();
@@ -619,7 +700,7 @@
 
 
 /***/ },
-/* 7 */
+/* 8 */
 /***/ function(module, exports) {
 
 	Feature = function (args) {
@@ -645,13 +726,13 @@
 
 
 /***/ },
-/* 8 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(7);
-	var Item = __webpack_require__(9);
-	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(8);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
 	  worldMap: this,
@@ -690,7 +771,7 @@
 
 
 /***/ },
-/* 9 */
+/* 10 */
 /***/ function(module, exports) {
 
 	Item = function (args) {
@@ -699,6 +780,7 @@
 	  this.verbs = args.verbs;
 	  this.description = args.description;
 	  this.onGet = args.onGet;
+	  this.moves = args.moves;
 	};
 	
 	Item.prototype["check"] = function (noun, player) {
@@ -750,13 +832,13 @@
 
 
 /***/ },
-/* 10 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(7);
-	var Item = __webpack_require__(9);
-	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(8);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
 	
 	var area = new Area ({
 	  worldMap: this,
@@ -810,14 +892,14 @@
 
 
 /***/ },
-/* 11 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(7);
-	var Box = __webpack_require__(12);
-	var Item = __webpack_require__(9);
-	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(8);
+	var Box = __webpack_require__(13);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
 	  description: "A single-room building, about ten yards wide in either direction,",
@@ -882,7 +964,7 @@
 	        }),
 	        new Item ({
 	          name: "keys",
-	          checkText: "An aluminium ring of keys with a small silver key on it and a larger black car key.",
+	          checkText: "An aluminium ring of keys with a small silver key on it and a larger brass key.",
 	          description: "a set of keys",
 	          verbs: ["check", "get"],
 	        }),
@@ -909,6 +991,38 @@
 	      name: "sword",
 	      checkText: "A sword. You can get it if you want it.",
 	      description: "There is a sword leaning beside it.",
+	      moves: [
+	        {
+	          name: 'forward thrust',
+	          attack: {
+	            cut: 0,
+	            stab: 24,
+	            crush: 0,
+	            blast: 0,
+	          },
+	          defense: {
+	            cut: 12,
+	            stab: 0,
+	            crush: 6,
+	            blast: 0,
+	          },
+	        },
+	        {
+	          name: 'cross cut',
+	          attack: {
+	            cut: 24,
+	            stab: 0,
+	            crush: 0,
+	            blast: 0,
+	          },
+	          defense: {
+	            cut: 12,
+	            stab: 3,
+	            crush: 3,
+	            blast: 0,
+	          },
+	        },
+	      ],
 	      verbs: ["check", "get"],
 	
 	      onGet: function () {
@@ -922,7 +1036,7 @@
 
 
 /***/ },
-/* 12 */
+/* 13 */
 /***/ function(module, exports) {
 
 	Box = function (args) {
@@ -972,15 +1086,15 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(7);
-	var Fighter = __webpack_require__(14);
-	var Box = __webpack_require__(12);
-	var Item = __webpack_require__(9);
-	var Exit = __webpack_require__(6);
+	var Feature = __webpack_require__(8);
+	var Fighter = __webpack_require__(5);
+	var Box = __webpack_require__(13);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
 	
 	var kannuki = __webpack_require__(15);
 	
@@ -1012,92 +1126,10 @@
 
 
 /***/ },
-/* 14 */
-/***/ function(module, exports) {
-
-	/*jshint sub:true*/
-	Fighter = function (args) {
-	  this.checkText = args.checkText;
-	  this.name = args.name;
-	  this.verbs = args.verbs;
-	  this.description = args.description;
-	  this.hitpoints = args.hitpoints;
-	  this.moves = args.moves;
-	  this.onFight = args.onFight;
-	};
-	
-	Fighter.prototype["check"] = function (noun, player) {
-	  player.display(noun.checkText);
-	  if (this.onCheck) {
-	    this.onCheck();
-	  }
-	};
-	
-	Fighter.prototype["attack"] = function (noun, player) {
-	  player.getMove(noun);
-	};
-	
-	Fighter.prototype.startFight = function (target) {
-	  var move = this.chooseMove();
-	  target.isAttacked(this, move);
-	};
-	
-	Fighter.prototype.chooseMove = function (attackerMove) {
-	  return this.moves[0];
-	  // Move decision logic will be based on data in the Fighter's memory object
-	  // about what has been most effective in the past.
-	};
-	
-	Fighter.prototype.hitpointsString = function () {
-	  var string = "";
-	  for (var x = 0; x < this.hitpoints; x+=3) {
-	    string += "█";
-	  }
-	  if (string.length < this.hitpoints/3) {
-	    string += "▌";
-	  }
-	  return string;
-	};
-	
-	Fighter.prototype.isAttacked = function (opponent, move) {
-	  if (this.onFight) {
-	    this.onFight();
-	  }
-	  var response = this.chooseMove(move);
-	  // The Fighter will sometimes flee, otherwise they attack
-	  if (opponent.haveFightDescribed) {
-	    opponent.haveFightDescribed(this, function () {
-	      this.engage(opponent, opponent.currentMove.data, response);
-	      opponent.engage(this, response, opponent.currentMove.data);
-	    }.bind(this));
-	  }
-	};
-	
-	Fighter.prototype.engage = function (opponent, move, response) {
-	  var damage = 0;
-	  var damageTypes = ['cut', 'stab', 'crush', 'blast'];
-	
-	  damageTypes.forEach(function (type) {
-	    damage += (move.attack[type] - response.defense[type]) < 0 ?
-	    0 : (move.attack[type] - response.defense[type]);
-	  });
-	  this.hitpoints -= damage;
-	  if (this.hitpoints < 0) {
-	    window.alert("You beat Kannuki! The game is only a demo right now -- that's all we've got so far.");
-	  }
-	  if (opponent.hitpoints < 0) {
-	    window.alert("Kannuki killed you! The game is only a demo right now -- that's all we've got so far.");
-	  }
-	};
-	
-	module.exports = Fighter;
-
-
-/***/ },
 /* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var Fighter = __webpack_require__(14);
+	var Fighter = __webpack_require__(5);
 	
 	var fighter = new Fighter ({
 	  name: "Kannuki",

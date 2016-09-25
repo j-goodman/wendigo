@@ -56,6 +56,10 @@ Fighter.prototype.isAttacked = function (opponent, move) {
   }
 };
 
+Fighter.prototype.die = function () {
+  console.log("I've died!");
+};
+
 Fighter.prototype.engage = function (opponent, move, response) {
   var damage = 0;
   var damageTypes = ['cut', 'stab', 'crush', 'blast'];
@@ -66,10 +70,10 @@ Fighter.prototype.engage = function (opponent, move, response) {
   });
   this.hitpoints -= damage;
   if (this.hitpoints < 0) {
-    window.alert("You beat Kannuki! The game is only a demo right now -- that's all we've got so far.");
+    this.die();
   }
   if (opponent.hitpoints < 0) {
-    window.alert("Kannuki killed you! The game is only a demo right now -- that's all we've got so far.");
+    opponent.die();
   }
 };
 

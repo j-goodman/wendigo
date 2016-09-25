@@ -4,6 +4,7 @@ Item = function (args) {
   this.verbs = args.verbs;
   this.description = args.description;
   this.onGet = args.onGet;
+  this.moves = args.moves;
 };
 
 Item.prototype["check"] = function (noun, player) {

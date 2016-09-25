@@ -67,7 +67,7 @@ area = new Area ({
         }),
         new Item ({
           name: "keys",
-          checkText: "An aluminium ring of keys with a small silver key on it and a larger black car key.",
+          checkText: "An aluminium ring of keys with a small silver key on it and a larger brass key.",
           description: "a set of keys",
           verbs: ["check", "get"],
         }),
@@ -94,6 +94,38 @@ area = new Area ({
       name: "sword",
       checkText: "A sword. You can get it if you want it.",
       description: "There is a sword leaning beside it.",
+      moves: [
+        {
+          name: 'forward thrust',
+          attack: {
+            cut: 0,
+            stab: 24,
+            crush: 0,
+            blast: 0,
+          },
+          defense: {
+            cut: 12,
+            stab: 0,
+            crush: 6,
+            blast: 0,
+          },
+        },
+        {
+          name: 'cross cut',
+          attack: {
+            cut: 24,
+            stab: 0,
+            crush: 0,
+            blast: 0,
+          },
+          defense: {
+            cut: 12,
+            stab: 3,
+            crush: 3,
+            blast: 0,
+          },
+        },
+      ],
       verbs: ["check", "get"],
 
       onGet: function () {
