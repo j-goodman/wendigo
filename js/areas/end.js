@@ -5,7 +5,7 @@ var Item = require('../item.js');
 var Exit = require('../exit.js');
 
 area = new Area ({
-  description: "A vast empty white space. This is the end of the demo!",
+  description: "A vast empty white space. This is the end of the demo.",
   name: 'end',
   worldMap: this,
   contents: [

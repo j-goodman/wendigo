@@ -1237,7 +1237,7 @@
 	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
-	  description: "A vast empty white space. This is the end of the demo!",
+	  description: "A vast empty white space. This is the end of the demo.",
 	  name: 'end',
 	  worldMap: this,
 	  contents: [
