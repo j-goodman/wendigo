@@ -74,10 +74,10 @@ Fighter.prototype.engage = function (opponent, move, response) {
     0 : (move.attack[type] - response.defense[type]);
   });
   this.hitpoints -= damage;
-  if (this.hitpoints < 0) {
+  if (this.hitpoints <= 0) {
     this.die(opponent);
   }
-  if (opponent.hitpoints < 0) {
+  if (opponent.hitpoints <= 0) {
     opponent.die();
   }
 };

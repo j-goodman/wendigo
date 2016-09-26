@@ -8,7 +8,7 @@ var fighter = new Fighter ({
   hitpoints: 100,
   onDeath: function () {
     this.name = "Kannuki's body";
-    this.checkText = "The body of a tall whitehaired man, cut through with red slash wounds.";
+    this.checkText = "The body of a tall whitehaired man, run through with wet red gouges.";
     this.description = "Kannuki's body lies crumpled among the dust.";
     this.location.getNouns();
     var door = this.location.getNoun('far door');
