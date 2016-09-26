@@ -6,10 +6,6 @@ var fighter = new Fighter ({
   checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
   verbs: ["check", "attack"],
   hitpoints: 100,
-  onFight: function () {
-    window.alert('Use the left and right keys to see what moves you know, then use the spacebar to choose.');
-    this.onFight = null;
-  }.bind(this),
   onDeath: function () {
     this.name = "Kannuki's body";
     this.checkText = "The body of a tall whitehaired man, cut through with red slash wounds.";

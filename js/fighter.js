@@ -62,6 +62,7 @@ Fighter.prototype.die = function (opponent) {
     this.onDeath();
   }
   opponent.concludeFight();
+  this.engage = null;
 };
 
 Fighter.prototype.engage = function (opponent, move, response) {

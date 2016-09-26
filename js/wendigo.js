@@ -665,6 +665,7 @@
 	    this.onDeath();
 	  }
 	  opponent.concludeFight();
+	  this.engage = null;
 	};
 	
 	Fighter.prototype.engage = function (opponent, move, response) {
@@ -1073,7 +1074,7 @@
 	      verbs: ["check", "get"],
 	
 	      onGet: function () {
-	        this.checkText = "A machete. It can be used to block as well as to attack, so it will protect you from cutting (<v>♦</v>) and stabbing (<v>♠</v>) damage while inflicting the same.";
+	        this.checkText = "A machete. It can be used to block as well as to attack, so it will protect you from cutting (<v>♦</v>) and stabbing (<v>♠</v>) damage while inflicting the same.<br><br>When fighting, use the left and right arrows to see your moves and the spacebar to select one.";
 	      },
 	    }),
 	  ],
@@ -1195,10 +1196,6 @@
 	  checkText: "A tall whitehaired man in a long coat holding a sword. He looks as if he's shrunken with age, but he still stands a head taller than you.",
 	  verbs: ["check", "attack"],
 	  hitpoints: 100,
-	  onFight: function () {
-	    window.alert('Use the left and right keys to see what moves you know, then use the spacebar to choose.');
-	    this.onFight = null;
-	  }.bind(this),
 	  onDeath: function () {
 	    this.name = "Kannuki's body";
 	    this.checkText = "The body of a tall whitehaired man, cut through with red slash wounds.";
