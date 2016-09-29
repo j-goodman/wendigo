@@ -36,6 +36,21 @@ var fighter = new Fighter ({
         blast: 0,
       },
     },
+    {
+      name: 'upper cut',
+      attack: {
+        cut: 28,
+        stab: 0,
+        crush: 0,
+        blast: 0,
+      },
+      defense: {
+        cut: 8,
+        stab: 3,
+        crush: 0,
+        blast: 0,
+      },
+    },
   ],
 });
 

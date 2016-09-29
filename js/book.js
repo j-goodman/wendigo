@@ -13,6 +13,7 @@ Book = function (args) {
 };
 
 Book.prototype.init = function () {
+  window.scrollTo(0, 0);
   var input = document.getElementById('main-input');
   input.onkeydown = function (event) {
     if (event.keyCode === 13) {
@@ -97,7 +98,7 @@ Book.prototype.describeFight = function (player, opponent, callback) {
     data: player.moves[0],
   };
   this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.currentMove);
   this.setUpFightControls(fight, callback);
 };
 
@@ -120,7 +121,7 @@ Book.prototype.setUpFightControls = function (fight, callback) {
     }
     player.currentMove.data = player.moves[player.currentMove.index];
     this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.currentMove);
   }.bind(this);
   slideRight = function () {
     player.currentMove.index += 1;
@@ -129,7 +130,7 @@ Book.prototype.setUpFightControls = function (fight, callback) {
     }
     player.currentMove.data = player.moves[player.currentMove.index];
     this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.currentMove);
   }.bind(this);
   window.onkeydown = function (event) {
     if (event.key == 'ArrowLeft') {
@@ -149,9 +150,11 @@ Book.prototype.unplugFightControls = function () {
 };
 
 Book.prototype.updateFightDisplay = function (player, opponent, comment) {
-  this.fightComment = comment;
+  if (comment) {
+    this.fightComment = comment;
+  }
   this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
+  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(opponent, opponent.currentMove);
 };
 
 Book.prototype.printFightMove = function (move) {

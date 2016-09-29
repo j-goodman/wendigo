@@ -27,7 +27,9 @@ Fighter.prototype.startFight = function (target) {
 };
 
 Fighter.prototype.chooseMove = function (attackerMove) {
-  return this.moves[0];
+  var move = this.moves[Math.floor(Math.random()*this.moves.length*0.99)];
+  this.currentMove = move;
+  return move;
   // Move decision logic will be based on data in the Fighter's memory object
   // about what has been most effective in the past.
 };
@@ -55,17 +57,27 @@ Fighter.prototype.isAttacked = function (opponent, move) {
       opponent.engage(this, response, opponent.currentMove.data);
     }.bind(this));
   }
+  if (opponent.book) {
+    this.attackInterval = window.setInterval(function () {
+      if (Math.round(Math.random())) {
+        this.chooseMove();
+        opponent.book.updateFightDisplay(opponent, this);
+      }
+    }.bind(this), 750);
+  }
 };
 
 Fighter.prototype.die = function (opponent) {
   if (this.onDeath) {
     this.onDeath();
   }
+  clearInterval(this.attackInterval);
   opponent.concludeFight();
   this.engage = null;
 };
 
 Fighter.prototype.engage = function (opponent, move, response) {
+  this.chooseMove();
   var damage = 0;
   var damageTypes = ['cut', 'stab', 'crush', 'blast'];
 

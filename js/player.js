@@ -16,6 +16,9 @@ Player.prototype.getInput = function (input) {
 
 Player.prototype.parseInput = function (input) {
   input = input.toLowerCase();
+  if (input[0] === ' ') {
+    input = input.slice(1, input.length);
+  }
   var verbs = this.location.verbs;
   var nouns = this.location.nouns;
   var verb;
@@ -81,7 +84,6 @@ Player.prototype.executeCommand = function (verb, noun) {
 
   Player.prototype.getMove = function (attacker, attackerMove) {
     var move = this.moves[0];
-
     this.attack(attacker, move);
 
     // The player will choose from their list of moves, sometimes getting hints

@@ -164,6 +164,7 @@
 	};
 	
 	Book.prototype.init = function () {
+	  window.scrollTo(0, 0);
 	  var input = document.getElementById('main-input');
 	  input.onkeydown = function (event) {
 	    if (event.keyCode === 13) {
@@ -248,7 +249,7 @@
 	    data: player.moves[0],
 	  };
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.currentMove);
 	  this.setUpFightControls(fight, callback);
 	};
 	
@@ -271,7 +272,7 @@
 	    }
 	    player.currentMove.data = player.moves[player.currentMove.index];
 	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.currentMove);
 	  }.bind(this);
 	  slideRight = function () {
 	    player.currentMove.index += 1;
@@ -280,7 +281,7 @@
 	    }
 	    player.currentMove.data = player.moves[player.currentMove.index];
 	    this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.moves[0]);
+	    this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.currentMove);
 	  }.bind(this);
 	  window.onkeydown = function (event) {
 	    if (event.key == 'ArrowLeft') {
@@ -300,9 +301,11 @@
 	};
 	
 	Book.prototype.updateFightDisplay = function (player, opponent, comment) {
-	  this.fightComment = comment;
+	  if (comment) {
+	    this.fightComment = comment;
+	  }
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
-	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(opponent, opponent.moves[0]);
+	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(opponent, opponent.currentMove);
 	};
 	
 	Book.prototype.printFightMove = function (move) {
@@ -387,6 +390,9 @@
 	
 	Player.prototype.parseInput = function (input) {
 	  input = input.toLowerCase();
+	  if (input[0] === ' ') {
+	    input = input.slice(1, input.length);
+	  }
 	  var verbs = this.location.verbs;
 	  var nouns = this.location.nouns;
 	  var verb;
@@ -452,7 +458,6 @@
 	
 	  Player.prototype.getMove = function (attacker, attackerMove) {
 	    var move = this.moves[0];
-	
 	    this.attack(attacker, move);
 	
 	    // The player will choose from their list of moves, sometimes getting hints
@@ -630,7 +635,9 @@
 	};
 	
 	Fighter.prototype.chooseMove = function (attackerMove) {
-	  return this.moves[0];
+	  var move = this.moves[Math.floor(Math.random()*this.moves.length*0.99)];
+	  this.currentMove = move;
+	  return move;
 	  // Move decision logic will be based on data in the Fighter's memory object
 	  // about what has been most effective in the past.
 	};
@@ -658,17 +665,27 @@
 	      opponent.engage(this, response, opponent.currentMove.data);
 	    }.bind(this));
 	  }
+	  if (opponent.book) {
+	    this.attackInterval = window.setInterval(function () {
+	      if (Math.round(Math.random())) {
+	        this.chooseMove();
+	        opponent.book.updateFightDisplay(opponent, this);
+	      }
+	    }.bind(this), 750);
+	  }
 	};
 	
 	Fighter.prototype.die = function (opponent) {
 	  if (this.onDeath) {
 	    this.onDeath();
 	  }
+	  clearInterval(this.attackInterval);
 	  opponent.concludeFight();
 	  this.engage = null;
 	};
 	
 	Fighter.prototype.engage = function (opponent, move, response) {
+	  this.chooseMove();
 	  var damage = 0;
 	  var damageTypes = ['cut', 'stab', 'crush', 'blast'];
 	
@@ -1223,6 +1240,21 @@
 	        cut: 12,
 	        stab: 3,
 	        crush: 3,
+	        blast: 0,
+	      },
+	    },
+	    {
+	      name: 'upper cut',
+	      attack: {
+	        cut: 28,
+	        stab: 0,
+	        crush: 0,
+	        blast: 0,
+	      },
+	      defense: {
+	        cut: 8,
+	        stab: 3,
+	        crush: 0,
 	        blast: 0,
 	      },
 	    },
