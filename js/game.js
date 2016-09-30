@@ -21,7 +21,7 @@ var init = function () {
     name: 'Sanjuro',
     moves: [],
     hitpoints: 100,
-    spawnpoint: 'farmhouse',
+    spawnpoint: 'dirt_road',
     worldMap: game.worldMap,
   });
   game.player.init();

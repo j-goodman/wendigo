@@ -67,7 +67,7 @@
 	    name: 'Sanjuro',
 	    moves: [],
 	    hitpoints: 100,
-	    spawnpoint: 'farmhouse',
+	    spawnpoint: 'dirt_road',
 	    worldMap: game.worldMap,
 	  });
 	  game.player.init();
@@ -719,7 +719,8 @@
 	worldMap.studio = __webpack_require__(11);
 	worldMap.farmhouse = __webpack_require__(12);
 	worldMap.wheatfield = __webpack_require__(14);
-	worldMap.end = __webpack_require__(16);
+	worldMap.dirt_road = __webpack_require__(16);
+	worldMap.end = __webpack_require__(17);
 	
 	module.exports = worldMap;
 
@@ -1267,6 +1268,52 @@
 
 /***/ },
 /* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Area = __webpack_require__(1);
+	var Feature = __webpack_require__(8);
+	var Box = __webpack_require__(13);
+	var Item = __webpack_require__(10);
+	var Exit = __webpack_require__(7);
+	
+	area = new Area ({
+	  description: "You're walking down a dirt road.",
+	  name: 'road',
+	  worldMap: this,
+	  contents: [
+	    new Feature ({ // Should double as an exit, with a non-explicit go to action.
+	      name: "trees",
+	      description: "You can hear cicadas rattling in the trees surrounding you",
+	      checkText: "The trees are growing smaller and farther apart here in the higher altitudes of the plateau. Past the river ahead of you they seem to die out entirely except for the orange acacias.",
+	      verbs: ["check"],
+	    }),
+	    new Feature ({ // Should double as an exit, with a non-explicit go to action.
+	      name: "river",
+	      description: "",
+	      checkText: "The river runs north to south, across the road you're walking. It's too deep to ford.",
+	      verbs: ["check"],
+	    }),
+	    new Exit ({
+	      name: "bridge",
+	      description: "and you can smell the residue from the paper mill that's upstream on the river that flows under the bridge you're approaching. You've never heard or smelled either of those things before and you assume they're associated somehow. You can check the bridge to look closer at it.",
+	      checkText: "You can go to the bridge if you want to cross the river. On the other side the dirt road stretches out through dry prairies towards a town that you can just make out through the dust in the distance.",
+	      destinationName: 'bridge',
+	      verbs: ["check", "go to"],
+	    }),
+	    new Item ({
+	      name: "dead snake",
+	      checkText: "It's a dull-scaled twenty inch snake, red with streaks of black. It looks about a day dead.",
+	      description: "There's a dead snake in the road. You could get it if you wanted it.",
+	      verbs: ["check", "get"],
+	    }),
+	  ],
+	});
+	
+	module.exports = area;
+
+
+/***/ },
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
