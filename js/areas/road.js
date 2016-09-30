@@ -5,17 +5,18 @@ var Item = require('../item.js');
 var Exit = require('../exit.js');
 
 area = new Area ({
-  description: "You're walking down a dirt road.",
+  description: "You're walking east down a dirt road.",
   name: 'road',
   worldMap: this,
   contents: [
-    new Feature ({ // Should double as an exit, with a non-explicit go to action.
+    new Exit ({
       name: "trees",
       description: "You can hear cicadas rattling in the trees surrounding you",
-      checkText: "The trees are growing smaller and farther apart here in the higher altitudes of the plateau. Past the river ahead of you they seem to die out entirely except for the shrubby, dry acacias.",
+      checkText: "The trees are growing smaller and farther apart here in the higher altitudes of the plateau. Past the river ahead of you they seem to die out entirely except for the dry shrubby acacias.",
+      destinationName: 'woods',
       verbs: ["check"],
     }),
-    new Feature ({ // Should double as an exit, with a non-explicit go to action.
+    new Feature ({
       name: "river",
       description: "",
       checkText: "The river runs north to south, across the road you're walking. It's too deep to ford.",

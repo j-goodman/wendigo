@@ -19,7 +19,6 @@ var fighter = new Fighter ({
     table.checkText = 'Like its twin, this one is made of a cool, light, smooth wood.';
     corpse.name = '';
     corpse.description = '';
-
   },
   moves: [
     {
