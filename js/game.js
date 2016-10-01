@@ -18,7 +18,7 @@ var init = function () {
       inventory: 'inventory',
       highlighter: 'highlighter',
     }),
-    name: 'Sanjuro',
+    name: 'Swift Runner',
     moves: [],
     hitpoints: 100,
     spawnpoint: 'road',

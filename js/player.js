@@ -207,6 +207,11 @@ Player.prototype.hitpointsString = Fighter.prototype.hitpointsString;
 
 Player.prototype.enterArea = function () {
   this.lookAround();
+  this.location.player = this;
+};
+
+Player.prototype.readArea = function (area) {
+  this.book.readArea(area);
 };
 
 Player.prototype.lookAround = function () {

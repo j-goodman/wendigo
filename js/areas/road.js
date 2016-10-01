@@ -8,6 +8,9 @@ area = new Area ({
   description: "You're walking east down a dirt road.",
   name: 'road',
   worldMap: this,
+  onExit: function () {
+    this.description = "";
+  },
   contents: [
     new Exit ({
       name: "trees",

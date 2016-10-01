@@ -5,10 +5,17 @@ var Item = require('../item.js');
 var Exit = require('../exit.js');
 
 area = new Area ({
-  description: "You walk off into the sparse woods surrounding the east-west road.",
+  description: "You walk off into the sparse woods surrounding",
   name: 'woods',
   worldMap: this,
   contents: [
+    new Exit ({
+      name: "road",
+      description: "the east-west road.",
+      checkText: "It's the road you arrived by.",
+      destinationName: 'road',
+      verbs: ["check", "go to"],
+    }),
     new Feature ({
       name: "trees",
       description: "Most of the trees are around your height, with ferns and grass gathering up around their bases.",

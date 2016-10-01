@@ -64,7 +64,7 @@
 	      inventory: 'inventory',
 	      highlighter: 'highlighter',
 	    }),
-	    name: 'Sanjuro',
+	    name: 'Swift Runner',
 	    moves: [],
 	    hitpoints: 100,
 	    spawnpoint: 'road',
@@ -581,6 +581,11 @@
 	
 	Player.prototype.enterArea = function () {
 	  this.lookAround();
+	  this.location.player = this;
+	};
+	
+	Player.prototype.readArea = function (area) {
+	  this.book.readArea(area);
 	};
 	
 	Player.prototype.lookAround = function () {
@@ -720,12 +725,12 @@
 	// worldMap.farmhouse = require('./areas/farmhouse.js');
 	// worldMap.wheatfield = require('./areas/wheatfield.js');
 	// worldMap.end = require('./areas/end.js');
-	worldMap.road = __webpack_require__(16);
-	worldMap.bridge = __webpack_require__(17);
-	worldMap.woods = __webpack_require__(20);
-	worldMap.bog = __webpack_require__(21);
-	worldMap.clearing = __webpack_require__(23);
-	worldMap.boulder = __webpack_require__(22);
+	worldMap.road = __webpack_require__(9);
+	worldMap.bridge = __webpack_require__(12);
+	worldMap.woods = __webpack_require__(14);
+	worldMap.bog = __webpack_require__(15);
+	worldMap.clearing = __webpack_require__(16);
+	worldMap.boulder = __webpack_require__(17);
 	
 	module.exports = worldMap;
 
@@ -799,8 +804,107 @@
 
 
 /***/ },
-/* 9 */,
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Area = __webpack_require__(1);
+	var Feature = __webpack_require__(8);
+	var Box = __webpack_require__(10);
+	var Item = __webpack_require__(11);
+	var Exit = __webpack_require__(7);
+	
+	area = new Area ({
+	  description: "You're walking east down a dirt road.",
+	  name: 'road',
+	  worldMap: this,
+	  onExit: function () {
+	    this.description = "";
+	  },
+	  contents: [
+	    new Exit ({
+	      name: "trees",
+	      description: "You can hear cicadas rattling in the trees surrounding you",
+	      checkText: "The trees are growing smaller and farther apart here in the higher altitudes of the plateau. Past the river ahead of you they seem to die out entirely except for the dry shrubby acacias.",
+	      destinationName: 'woods',
+	      verbs: ["check"],
+	    }),
+	    new Feature ({
+	      name: "river",
+	      description: "",
+	      checkText: "The river runs north to south, across the road you're walking. It's too deep to ford.",
+	      verbs: ["check"],
+	    }),
+	    new Exit ({
+	      name: "bridge",
+	      description: "and you can smell the residue from the paper mill that's upstream on the river that flows under the bridge you're approaching. You've never heard or smelled either of those things before and you assume they're associated somehow. You can check the bridge to look closer at it.",
+	      checkText: "You can go to the bridge if you want to cross the river. On the other side the dirt road stretches out through dry prairies towards a town that you can just make out through the dust in the distance.",
+	      destinationName: 'bridge',
+	      verbs: ["check", "go to"],
+	    }),
+	    new Item ({
+	      name: "dead snake",
+	      checkText: "It's a dull-scaled twenty inch snake, red with streaks of black. It looks about a day dead.",
+	      description: "There's a dead snake in the road. You could get it if you wanted it.",
+	      verbs: ["check", "get"],
+	    }),
+	  ],
+	});
+	
+	module.exports = area;
+
+
+/***/ },
 /* 10 */
+/***/ function(module, exports) {
+
+	Box = function (args) {
+	  this.checkText = args.checkText;
+	  this.contents = args.contents;
+	  this.postscript = args.postscript;
+	  this.name = args.name;
+	  this.verbs = args.verbs;
+	  this.description = args.description;
+	};
+	
+	Box.prototype["check"] = function (noun, player) {
+	  var description = noun.checkText + " ";
+	  if (noun.contents.length === 0) {
+	    description += "nothing.";
+	    description = player.highlight(description);
+	    player.display(description);
+	    return undefined;
+	  }
+	  if (noun.contents.length === 1) {
+	    description += noun.contents[0].description + ".";
+	    description = player.highlight(description);
+	    player.display(description);
+	    return undefined;
+	  }
+	  for (var x = 0 ; x < noun.contents.length-1 ; x++) {
+	    description += noun.contents[x].description;
+	    description += ", ";
+	  }
+	  description += "and " + noun.contents[noun.contents.length-1].description;
+	  if (noun.postscript) {
+	    description += noun.postscript;
+	  }
+	  description += ".";
+	  description = player.highlight(description);
+	  player.display(description);
+	  if (this.onCheck) {
+	    this.onCheck();
+	  }
+	};
+	
+	Box.prototype["@"] = function (noun, player) {
+	  this["check"]();
+	};
+	
+	module.exports = Box;
+
+
+/***/ },
+/* 11 */
 /***/ function(module, exports) {
 
 	Item = function (args) {
@@ -859,122 +963,29 @@
 
 
 /***/ },
-/* 11 */,
-/* 12 */,
-/* 13 */
-/***/ function(module, exports) {
-
-	Box = function (args) {
-	  this.checkText = args.checkText;
-	  this.contents = args.contents;
-	  this.postscript = args.postscript;
-	  this.name = args.name;
-	  this.verbs = args.verbs;
-	  this.description = args.description;
-	};
-	
-	Box.prototype["check"] = function (noun, player) {
-	  var description = noun.checkText + " ";
-	  if (noun.contents.length === 0) {
-	    description += "nothing.";
-	    description = player.highlight(description);
-	    player.display(description);
-	    return undefined;
-	  }
-	  if (noun.contents.length === 1) {
-	    description += noun.contents[0].description + ".";
-	    description = player.highlight(description);
-	    player.display(description);
-	    return undefined;
-	  }
-	  for (var x = 0 ; x < noun.contents.length-1 ; x++) {
-	    description += noun.contents[x].description;
-	    description += ", ";
-	  }
-	  description += "and " + noun.contents[noun.contents.length-1].description;
-	  if (noun.postscript) {
-	    description += noun.postscript;
-	  }
-	  description += ".";
-	  description = player.highlight(description);
-	  player.display(description);
-	  if (this.onCheck) {
-	    this.onCheck();
-	  }
-	};
-	
-	Box.prototype["@"] = function (noun, player) {
-	  this["check"]();
-	};
-	
-	module.exports = Box;
-
-
-/***/ },
-/* 14 */,
-/* 15 */,
-/* 16 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(8);
-	var Box = __webpack_require__(13);
-	var Item = __webpack_require__(10);
+	var Box = __webpack_require__(10);
+	var Item = __webpack_require__(11);
 	var Exit = __webpack_require__(7);
 	
-	area = new Area ({
-	  description: "You're walking east down a dirt road.",
-	  name: 'road',
-	  worldMap: this,
-	  contents: [
-	    new Exit ({
-	      name: "trees",
-	      description: "You can hear cicadas rattling in the trees surrounding you",
-	      checkText: "The trees are growing smaller and farther apart here in the higher altitudes of the plateau. Past the river ahead of you they seem to die out entirely except for the dry shrubby acacias.",
-	      destinationName: 'woods',
-	      verbs: ["check"],
-	    }),
-	    new Feature ({
-	      name: "river",
-	      description: "",
-	      checkText: "The river runs north to south, across the road you're walking. It's too deep to ford.",
-	      verbs: ["check"],
-	    }),
-	    new Exit ({
-	      name: "bridge",
-	      description: "and you can smell the residue from the paper mill that's upstream on the river that flows under the bridge you're approaching. You've never heard or smelled either of those things before and you assume they're associated somehow. You can check the bridge to look closer at it.",
-	      checkText: "You can go to the bridge if you want to cross the river. On the other side the dirt road stretches out through dry prairies towards a town that you can just make out through the dust in the distance.",
-	      destinationName: 'bridge',
-	      verbs: ["check", "go to"],
-	    }),
-	    new Item ({
-	      name: "dead snake",
-	      checkText: "It's a dull-scaled twenty inch snake, red with streaks of black. It looks about a day dead.",
-	      description: "There's a dead snake in the road. You could get it if you wanted it.",
-	      verbs: ["check", "get"],
-	    }),
-	  ],
-	});
-	
-	module.exports = area;
-
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(8);
-	var Box = __webpack_require__(13);
-	var Item = __webpack_require__(10);
-	var Exit = __webpack_require__(7);
-	
-	var theDevil = __webpack_require__(19);
+	var theDevil = __webpack_require__(13);
 	
 	area = new Area ({
 	  description: "You step out onto the steel bridge.",
 	  name: 'bridge',
 	  worldMap: this,
+	  onExit: function () {
+	    console.log('exit.');
+	    var east; var west;
+	    east = this.getNoun('east bank');
+	    west = this.getNoun('west bank');
+	    east.description = "From here you can go to the east bank";
+	    west.description = "or the west bank.";
+	  },
 	  contents: [
 	    new Feature ({
 	      name: "bridge",
@@ -982,20 +993,26 @@
 	      checkText: "It's a steel truss bridge, with rusted beams meeting overhead in a row of three triangles on each side. It looks like it was once painted green, but that's mostly chipped off.",
 	      verbs: ["check"],
 	    }),
+	    new Feature ({
+	      name: "feature",
+	      description: "",
+	      checkText: "The river runs fast and loudly some fifteen yards under your feet.",
+	      verbs: ["check"],
+	    }),
+	    new Exit ({
+	      name: "west bank",
+	      description: "From here you can return back the way you came to the west bank,",
+	      checkText: "That's the side you came from initially. From here it's a long walk back to Snoqualmie Falls.",
+	      destinationName: 'road',
+	      verbs: ["check", "go to"],
+	    }),
 	    new Exit ({
 	      name: "east bank",
-	      description: "From here you can go to the east bank",
+	      description: "or go to the east bank.",
 	      checkText: "The dirt road continues on the other side of the bridge and stretches out through dry prairies towards a town in the distance.",
 	      destinationName: 'road',
 	      locked: true,
 	      lockCheck: "You can't cross the bridge with the Devil in the way.",
-	      verbs: ["check", "go to"],
-	    }),
-	    new Exit ({
-	      name: "west bank",
-	      description: "or the west bank.",
-	      checkText: "That's the side you came from initially. From here it's a long walk back to Snoqualmie Falls.",
-	      destinationName: 'road',
 	      verbs: ["check", "go to"],
 	    }),
 	
@@ -1008,8 +1025,7 @@
 
 
 /***/ },
-/* 18 */,
-/* 19 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Fighter = __webpack_require__(5);
@@ -1017,13 +1033,26 @@
 	var fighter = new Fighter ({
 	  name: "the Devil",
 	  description: "The bridge is guarded by a tall man wearing a red horned mask of the Devil's face.",
-	  checkText: "He's wearing a smiling red painted mask with horns, a coarse black beard, and yellow eyes. It's tied around the back of his head with a string. He's holding a white steel sword and looking unmoving towards your direction. He makes no move to attack you.",
+	  checkText: "He's wearing a smiling red painted mask with horns, yellow eyes, and a beard that looks like it's made of black steel wool. It's tied around the back of his head with a string. He's holding a white steel sword and facing you. He makes no move to attack you.",
 	  verbs: ["check", "attack"],
 	  hitpoints: 100,
 	  onDeath: function () {
-	    this.name = "";
 	    this.checkText = "";
 	    this.description = "";
+	    this.location.player.readArea(this.location);
+	    window.setTimeout(function () {
+	      this.description = "The Devil staggers backward, silent and blood striped, and careens off the bridge down into the river below.";
+	      this.location.player.readArea(this.location);
+	    }.bind(this), 1200);
+	    window.setTimeout(function () {
+	      this.description = "The Devil's body disappears into the water.";
+	      this.location.player.readArea(this.location);
+	    }.bind(this), 5500);
+	    window.setTimeout(function () {
+	      this.name = "~~";
+	      this.description = "";
+	      this.location.player.readArea(this.location);
+	    }.bind(this), 8500);
 	    this.location.getNouns();
 	    var door = this.location.getNoun('east bank');
 	    door.locked = false;
@@ -1032,29 +1061,29 @@
 	    {
 	      name: 'cross cut',
 	      attack: {
-	        cut: 24,
-	        stab: 0,
-	        crush: 0,
-	        blast: 0,
-	      },
-	      defense: {
-	        cut: 12,
-	        stab: 3,
-	        crush: 3,
-	        blast: 0,
-	      },
-	    },
-	    {
-	      name: 'upper cut',
-	      attack: {
-	        cut: 28,
+	        cut: 20,
 	        stab: 0,
 	        crush: 0,
 	        blast: 0,
 	      },
 	      defense: {
 	        cut: 8,
-	        stab: 3,
+	        stab: 1,
+	        crush: 0,
+	        blast: 0,
+	      },
+	    },
+	    {
+	      name: 'upper cut',
+	      attack: {
+	        cut: 24,
+	        stab: 0,
+	        crush: 0,
+	        blast: 0,
+	      },
+	      defense: {
+	        cut: 4,
+	        stab: 1,
 	        crush: 0,
 	        blast: 0,
 	      },
@@ -1066,20 +1095,27 @@
 
 
 /***/ },
-/* 20 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(8);
-	var Box = __webpack_require__(13);
-	var Item = __webpack_require__(10);
+	var Box = __webpack_require__(10);
+	var Item = __webpack_require__(11);
 	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
-	  description: "You walk off into the sparse woods surrounding the east-west road.",
+	  description: "You walk off into the sparse woods surrounding",
 	  name: 'woods',
 	  worldMap: this,
 	  contents: [
+	    new Exit ({
+	      name: "road",
+	      description: "the east-west road.",
+	      checkText: "It's the road you arrived by.",
+	      destinationName: 'road',
+	      verbs: ["check", "go to"],
+	    }),
 	    new Feature ({
 	      name: "trees",
 	      description: "Most of the trees are around your height, with ferns and grass gathering up around their bases.",
@@ -1107,20 +1143,34 @@
 
 
 /***/ },
-/* 21 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(8);
-	var Box = __webpack_require__(13);
-	var Item = __webpack_require__(10);
+	var Box = __webpack_require__(10);
+	var Item = __webpack_require__(11);
 	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
-	  description: "",
-	  name: '',
+	  description: "The bog is a dark, sunken spot among the trees, a muddy pool with some dead leaves floating in it.",
+	  name: 'bog',
 	  worldMap: this,
 	  contents: [
+	    new Exit ({
+	      name: "trees",
+	      description: "The trees around you look like their roots are becoming choked with rot.",
+	      checkText: "You can go back into the trees to try to find the road again.",
+	      destinationName: 'woods',
+	      verbs: ["check", "go to"],
+	    }),
+	    new Exit ({
+	      name: "boulder",
+	      description: "You can see a tall boulder nearby.",
+	      checkText: "It's a tall grey boulder about fifteen yards away.",
+	      destinationName: 'boulder',
+	      verbs: ["check", "go to"],
+	    }),
 	  ],
 	});
 	
@@ -1128,20 +1178,93 @@
 
 
 /***/ },
-/* 22 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(8);
-	var Box = __webpack_require__(13);
-	var Item = __webpack_require__(10);
+	var Box = __webpack_require__(10);
+	var Item = __webpack_require__(11);
 	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
-	  description: "",
-	  name: '',
+	  description: "You come into a clearing where the ground under your feet is cold grey rock. You can hear the trees around you moving with the wind.",
+	  name: 'clearing',
 	  worldMap: this,
 	  contents: [
+	    new Exit ({
+	      name: "boulder",
+	      description: "There's a boulder twenty yards or so ahead of you.",
+	      checkText: "It's a tall grey boulder among the trees. You can go to it to see if there's anything behind it.",
+	      destinationName: 'boulder',
+	      verbs: ["check", "go to"],
+	    }),
+	    new Exit ({
+	      name: "trees",
+	      description: "The trees are becoming thicker around you.",
+	      checkText: "You can go back into the trees to try to find the road again.",
+	      destinationName: 'woods',
+	      verbs: ["check", "go to"],
+	    }),
+	    new Box ({
+	      name: "log",
+	      description: "There's a hollowed out log leaning against a tree at the edge of the clearing.",
+	      contents: [
+	        new Item ({
+	          name: "key",
+	          checkText: "It's a small key on a ring of wire. You can get it if you want it.",
+	          description: "a nickel silver key",
+	          verbs: ["check", "get"],
+	          onGet: function () {
+	            this.checkText = "It's a nickel silver key on a ring of wire.";
+	          },
+	        }),
+	        // * ALSO: An angry raccoon that fights you and you have to punch it to death
+	        new Item ({
+	          name: "machete",
+	          checkText: "It's a machete with a plain wood handle. It looks very sharp.",
+	          description: "a machete",
+	          moves: [
+	            {
+	              name: 'forward thrust',
+	              attack: {
+	                cut: 0,
+	                stab: 16,
+	                crush: 0,
+	                blast: 0,
+	              },
+	              defense: {
+	                cut: 8,
+	                stab: 0,
+	                crush: 0,
+	                blast: 0,
+	              },
+	            },
+	            {
+	              name: 'cross cut',
+	              attack: {
+	                cut: 16,
+	                stab: 0,
+	                crush: 0,
+	                blast: 0,
+	              },
+	              defense: {
+	                cut: 6,
+	                stab: 2,
+	                crush: 0,
+	                blast: 0,
+	              },
+	            },
+	          ],
+	          verbs: ["check", "get"],
+	          onGet: function () {
+	            this.checkText = "A machete. It can be used to block as well as to attack, so it will protect you from cutting (<v>♦</v>) and stabbing (<v>♠</v>) damage while inflicting the same.<br><br>When fighting, use the left and right arrows to see your moves and the spacebar to select one.";
+	          },
+	        }),
+	      ],
+	      checkText: "The log looks like it was deliberately carved out. It contains",
+	      verbs: ["check"],
+	    }),
 	  ],
 	});
 	
@@ -1149,13 +1272,13 @@
 
 
 /***/ },
-/* 23 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
 	var Feature = __webpack_require__(8);
-	var Box = __webpack_require__(13);
-	var Item = __webpack_require__(10);
+	var Box = __webpack_require__(10);
+	var Item = __webpack_require__(11);
 	var Exit = __webpack_require__(7);
 	
 	area = new Area ({
@@ -1163,6 +1286,31 @@
 	  name: '',
 	  worldMap: this,
 	  contents: [
+	    new Feature ({
+	      name: "boulder",
+	      description: "It's a grey boulder about twice your height. It's too steep to climb and there's nothing behind it.",
+	      checkText: "The boulder is made of grey rock with five or six long streaks of lighter grey going across it diagonally.",
+	      'climb': function () {
+	        console.log('You did it. You climbed on up the boulder and into the console.');
+	        // Gives you a 50/50 chance of being able to climb the boulder and see farther of falling down and maybe hurting yourself.
+	      },
+	      verbs: ["check", "climb"],
+	    }),
+	    new Exit ({
+	      name: "bog",
+	      description: "You can see the bog",
+	      checkText: "It's a muddy bog nearby. The water doesn't seem to reflect any light at all.",
+	      destinationName: 'bog',
+	      verbs: ["check", "go to"],
+	    }),
+	    new Exit ({
+	      name: "clearing",
+	      description: "and the clearing from here.",
+	      checkText: "It's a clearing between the treas up ahead.",
+	      destinationName: 'clearing',
+	      verbs: ["check", "go to"],
+	    }),
+	
 	  ],
 	});
 	
