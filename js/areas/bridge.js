@@ -26,7 +26,7 @@ area = new Area ({
       verbs: ["check"],
     }),
     new Feature ({
-      name: "feature",
+      name: "river",
       description: "",
       checkText: "The river runs fast and loudly some fifteen yards under your feet.",
       verbs: ["check"],

@@ -10,12 +10,6 @@ area = new Area ({
   worldMap: this,
   contents: [
     new Feature ({
-      name: "boulder",
-      description: "It's a grey boulder about twice your height. It's too steep to climb and there's nothing behind it.",
-      checkText: "The boulder is made of grey rock with five or six long streaks of lighter grey going across it diagonally.",
-      verbs: ["check", "climb"],
-    }),
-    new Feature ({
       name: "dirt",
       description: "",
       checkText: "It's got an almost sandy texture. It doesn't look like anything should be able to grow in this.",
@@ -30,82 +24,83 @@ area = new Area ({
     }),
     new Exit ({
       name: "clearing",
-      description: "and the clearing from here.",
+      description: "and the clearing from here.<br><br>",
       checkText: "It's a clearing between the treas up ahead.",
       destinationName: 'clearing',
       verbs: ["check", "go to"],
     }),
-
+    new Feature ({
+      name: "boulder",
+      description: "Between them is a grey boulder about twice your height. It's too steep to climb and there's nothing behind it.",
+      checkText: "The boulder is made of grey rock with five or six long streaks of lighter grey going across it diagonally.",
+      verbs: ["check", "climb"],
+    }),
   ],
 });
 
-area.contents[0].level = 0;
-area.contents[0].reset = function () {
-  this.description = "It's a grey boulder about twice your height. It's too steep to climb and there's nothing behind it.";
-  this.location.player.readArea(this.location);
-}.bind(area.contents[0]);
-area.contents[0].fall = function () {
-  this.description = "You lose your grip on the rock and fall back into the dirt.";
-  this.location.player.readArea(this.location);
-  window.setTimeout(function () {
-    this.reset();
-  }.bind(this), 3500);
-}.bind(area.contents[0]);
-area.contents[0].climb = function () {
-  var dice;
-  var rando = function (max_inclusive) {
-    return Math.floor(Math.random()*max_inclusive)+1;
-  };
-  if (this.level === 0) {
-    dice = rando(6)+rando(6);
-    if (dice < 5) {
-      this.description = "You jump up onto the boulder, trying to climb to a spot eight or nine feet up where the stone slopes forward. You're not able to get a grip on it and you fall back into the dry dirt.";
-      window.clearTimeout(this.clock2);
-      this.clock2 = window.setTimeout(function () {
-        this.reset();
-      }.bind(this), 6000);
-    } else if (dice < 9) {
-      this.description = "You jump up onto the boulder, trying to climb to a spot where the stone slopes forward. You get a grip on the ledge with your right hand but when your foot swings forward it doesn't find purchase below you. You slide off the boulder.";
-      window.clearTimeout(this.clock2);
-      this.clock2 = window.setTimeout(function () {
-        this.reset();
-      }.bind(this), 6000);
+area.onEnter = function () {
+  this.getNoun('boulder').description = "It's a grey boulder about twice your height. It's too steep to climb and there's nothing behind it.";
+  this.contents = this.contents.slice(0, 4);
+  this.progress = false;
+}.bind(area);
+
+area.getNoun('boulder').climb = function () {
+  var dice = Math.random();
+  if (!this.progress) {
+    if (dice < 0.3) {
+      this.description = "You make it halfway up the boulder, then slip and fall back into the dry dirt.";
+    } else if (dice < 0.6) {
+      this.description = "You manage to grab a handhold two thirds up the rock, but you can't find a place to put your feet and you fall.";
     } else {
-      this.description = "You manage to grab an angle about eight feet off the ground, and find a foothold in the boulder's face below you. You can try to climb to the top from here.";
-      this.level = 1;
-      this.clock = window.setTimeout(function () {
-        this.fall();
-        this.level = 0;
-      }.bind(this), 5500);
+      this.description = "You get a grip in a crack two thirds up the face of the rock and find a small raised jut to put your right foot on. You can climb the boulder to the top from here.";
+      this.progress = 'halfway';
     }
-  } else if (this.level === 1) {
-    dice = rando(6)+rando(6);
-    if (dice < 8) {
-      this.description = "You lose your footing and you fall back into the dry dirt.";
-      window.clearTimeout(this.clock);
-      window.clearTimeout(this.clock2);
-      this.clock2 = window.setTimeout(function () {
-        this.reset();
-      }.bind(this), 6000);
-    } else if (dice < 9) {
-      this.description = "You make it to the top of the boulder but accidentally bring yourself up with too much momentum, losing your balance and rolling back down into the dirt.";
-      window.clearTimeout(this.clock);
-      window.clearTimeout(this.clock2);
-      this.clock2 = window.setTimeout(function () {
-        this.reset();
-      }.bind(this), 6000);
+  } else if (this.progress === 'halfway') {
+    if (dice < 0.2) {
+      this.description = "Your foot slips as you prepare to reach for the top of the boulder, sending you tumbling backwards into the dirt.";
+      this.progress = false;
+    } else if (dice < 0.5) {
+      this.description = "You can't get a grip on the top of the rock, and you fall back down it.";
+      this.progress = false;
     } else {
-      this.description = "You reach the top of the boulder. From here you can see the clearing and the bog, as well as the road beyond them through the trees and the river flowing from north to south.";
-      this.level = 2;
-      window.clearTimeout(this.clock);
-      this.clock = window.setTimeout(function () {
-        this.fall();
-        this.level = 0;
-      }.bind(this), 20000);
+      this.progress = 'top';
+      this.description = "You reach the top of the boulder.";
+      this.location.contents.push(
+        new Feature ({
+          name: "trees",
+          description: "Over the trees you can see",
+          checkText: "The trees are growing thick and fast around the boulder and the bog, but seem to thin out on the other side of the river. In fact, beyond the river you can only see the strange scraggled acacias that have started to surround you in the past few miles of your journey.",
+          verbs: ["check"],
+        })
+      );
+      this.location.contents.push(
+        new Feature ({
+          name: "road",
+          description: "the road you came from,",
+          checkText: "It's a long dirt road extending far into the west, and leading over the bridge to a town in the east.",
+          verbs: ["check"],
+        })
+      );
+      this.location.contents.push(
+        new Feature ({
+          name: "river",
+          description: "as well as the river",
+          checkText: "The river is a deep blue streak from north to south across the landscape.",
+          verbs: ["check"],
+        })
+      );
+      this.location.contents.push(
+        new Feature ({
+          name: "bridge",
+          description: "and the steel beam bridge beyond it.",
+          checkText: "It's a rusting steel truss bridge. There's a man standing on it, wearing a red mask and holding something. He looks like he's guarding it.",
+          verbs: ["check"],
+        })
+      );
     }
   }
+  this.location.getNouns();
   this.location.player.readArea(this.location);
-  // Gives you a 50/50 chance of being able to climb the boulder and see farther of falling down and maybe hurting yourself.
-}.bind(area.contents[0]);
+}.bind(area.getNoun('boulder'));
 
 module.exports = area;

@@ -16,6 +16,7 @@ Exit.prototype["go to"] = function (noun, player) {
     var worldMap = require("./world.js");
     player.location = worldMap[noun.destinationName];
     if (this.onExit) { this.onExit(); }
+    if (player.location.onEnter) { player.location.onEnter(); }
     player.enterArea();
   } else {
     return noun.lockCheck;

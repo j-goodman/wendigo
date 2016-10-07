@@ -4,6 +4,7 @@ Area = function (args) {
   this.contents = args.contents;
   this.name = args.name;
   this.onExit = args.onExit;
+  this.onEnter = args.onEnter;
   this.worldMap = args.worldMap;
   this.getNouns = function () {
     var nouns = [];
