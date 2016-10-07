@@ -31,7 +31,7 @@ var fighter = new Fighter ({
     {
       name: 'cross cut',
       attack: {
-        cut: 20,
+        cut: 16,
         stab: 0,
         crush: 0,
         blast: 0,
@@ -46,7 +46,7 @@ var fighter = new Fighter ({
     {
       name: 'upper cut',
       attack: {
-        cut: 24,
+        cut: 20,
         stab: 0,
         crush: 0,
         blast: 0,
