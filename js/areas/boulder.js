@@ -68,7 +68,7 @@ area.getNoun('boulder').climb = function () {
       this.location.contents.push(
         new Feature ({
           name: "trees",
-          description: "Over the trees you can see",
+          description: "Checking the horizon over the trees reveals",
           checkText: "The trees are growing thick and fast around the boulder and the bog, but seem to thin out on the other side of the river. In fact, beyond the river you can only see the strange scraggled acacias that have started to surround you in the past few miles of your journey.",
           verbs: ["check"],
         })
