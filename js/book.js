@@ -100,6 +100,15 @@ Book.prototype.describeFight = function (player, opponent, callback) {
   this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
   this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.currentMove);
   this.setUpFightControls(fight, callback);
+  if (fight.opponent.name === "the Devil") {
+    window.setTimeout(function () {
+      this.backup = this.fightComment;
+      this.fightComment = 'press the spacebar to engage your opponent';
+    }.bind(this), 6000);
+    window.setTimeout(function () {
+      this.fightComment = this.backup;
+    }.bind(this), 8000);
+  }
 };
 
 Book.prototype.concludeFight = function () {

@@ -10,6 +10,7 @@ var worldMap = {};
 // worldMap.wheatfield = require('./areas/wheatfield.js');
 // worldMap.end = require('./areas/end.js');
 worldMap.road = require('./areas/road.js');
+worldMap.eastroad = require('./areas/eastroad.js');
 worldMap.bridge = require('./areas/bridge.js');
 worldMap.woods = require('./areas/woods.js');
 worldMap.bog = require('./areas/bog.js');

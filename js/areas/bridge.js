@@ -10,14 +10,6 @@ area = new Area ({
   description: "You step out onto the steel bridge.",
   name: 'bridge',
   worldMap: this,
-  onExit: function () {
-    console.log('exit.');
-    var east; var west;
-    east = this.getNoun('east bank');
-    west = this.getNoun('west bank');
-    east.description = "From here you can go to the east bank";
-    west.description = "or the west bank.";
-  },
   contents: [
     new Feature ({
       name: "bridge",
@@ -42,7 +34,7 @@ area = new Area ({
       name: "east bank",
       description: "or go to the east bank.",
       checkText: "The dirt road continues on the other side of the bridge and stretches out through dry prairies towards a town in the distance.",
-      destinationName: 'road',
+      destinationName: 'eastroad',
       locked: true,
       lockCheck: "You can't cross the bridge with the Devil in the way.",
       verbs: ["check", "go to"],

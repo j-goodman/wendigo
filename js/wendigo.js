@@ -252,6 +252,15 @@
 	  this.playerWindow.innerHTML = this.fightDisplay.fighter(player, player.currentMove.data);
 	  this.playerWindow.innerHTML += '<br><div>' + this.fightComment + '</div><br>' + this.fightDisplay.fighter(fight.opponent, fight.opponent.currentMove);
 	  this.setUpFightControls(fight, callback);
+	  if (fight.opponent.name === "the Devil") {
+	    window.setTimeout(function () {
+	      this.backup = this.fightComment;
+	      this.fightComment = 'press the spacebar to engage your opponent';
+	    }.bind(this), 6000);
+	    window.setTimeout(function () {
+	      this.fightComment = this.backup;
+	    }.bind(this), 8000);
+	  }
 	};
 	
 	Book.prototype.concludeFight = function () {
@@ -727,6 +736,7 @@
 	// worldMap.wheatfield = require('./areas/wheatfield.js');
 	// worldMap.end = require('./areas/end.js');
 	worldMap.road = __webpack_require__(9);
+	worldMap.eastroad = __webpack_require__(18);
 	worldMap.bridge = __webpack_require__(12);
 	worldMap.woods = __webpack_require__(14);
 	worldMap.bog = __webpack_require__(15);
@@ -824,11 +834,11 @@
 	  },
 	  contents: [
 	    new Exit ({
-	      name: "trees",
-	      description: "You can hear cicadas rattling in the trees surrounding you",
+	      name: "woods",
+	      description: "You can hear cicadas rattling in the woods surrounding you",
 	      checkText: "The trees are growing smaller and farther apart here in the higher altitudes of the plateau. Past the river ahead of you they seem to die out entirely except for the dry shrubby acacias.",
 	      destinationName: 'woods',
-	      verbs: ["check"],
+	      verbs: ["check", "go to"],
 	    }),
 	    new Feature ({
 	      name: "river",
@@ -980,14 +990,6 @@
 	  description: "You step out onto the steel bridge.",
 	  name: 'bridge',
 	  worldMap: this,
-	  onExit: function () {
-	    console.log('exit.');
-	    var east; var west;
-	    east = this.getNoun('east bank');
-	    west = this.getNoun('west bank');
-	    east.description = "From here you can go to the east bank";
-	    west.description = "or the west bank.";
-	  },
 	  contents: [
 	    new Feature ({
 	      name: "bridge",
@@ -1012,7 +1014,7 @@
 	      name: "east bank",
 	      description: "or go to the east bank.",
 	      checkText: "The dirt road continues on the other side of the bridge and stretches out through dry prairies towards a town in the distance.",
-	      destinationName: 'road',
+	      destinationName: 'eastroad',
 	      locked: true,
 	      lockCheck: "You can't cross the bridge with the Devil in the way.",
 	      verbs: ["check", "go to"],
@@ -1054,6 +1056,11 @@
 	      this.name = "~~";
 	      this.description = "";
 	      this.location.player.readArea(this.location);
+	      var east; var west;
+	      east = this.location.getNoun('east bank');
+	      west = this.location.getNoun('west bank');
+	      west.description = "From here you can go to the west bank";
+	      east.description = "or the east bank.";
 	    }.bind(this), 8500);
 	    this.location.getNouns();
 	    var door = this.location.getNoun('east bank');
@@ -1160,8 +1167,8 @@
 	  worldMap: this,
 	  contents: [
 	    new Exit ({
-	      name: "trees",
-	      description: "The trees around you look like their roots are becoming choked with rot.",
+	      name: "woods",
+	      description: "The woods around you look like their roots are becoming choked with rot.",
 	      checkText: "You can go back into the trees to try to find the road again.",
 	      destinationName: 'woods',
 	      verbs: ["check", "go to"],
@@ -1202,9 +1209,9 @@
 	      verbs: ["check", "go to"],
 	    }),
 	    new Exit ({
-	      name: "trees",
-	      description: "The trees are becoming thicker around you.",
-	      checkText: "You can go back into the trees to try to find the road again.",
+	      name: "woods",
+	      description: "The woods are becoming thicker around you.",
+	      checkText: "You can go back into the woods to try to find the road again.",
 	      destinationName: 'woods',
 	      verbs: ["check", "go to"],
 	    }),
@@ -1264,7 +1271,7 @@
 	          },
 	        }),
 	      ],
-	      checkText: "The log looks like it was deliberately carved out. It contains",
+	      checkText: "The log looks like it was deliberately made hollow. It contains",
 	      verbs: ["check"],
 	    }),
 	  ],
@@ -1328,7 +1335,7 @@
 	  if (!this.progress) {
 	    if (dice < 0.3) {
 	      this.description = "You make it halfway up the boulder, then slip and fall back into the dry dirt.";
-	    } else if (dice < 0.6) {
+	    } else if (dice < 0.5) {
 	      this.description = "You manage to grab a handhold two thirds up the rock, but you can't find a place to put your feet and you fall.";
 	    } else {
 	      this.description = "You get a grip in a crack two thirds up the face of the rock and find a small raised jut to put your right foot on. You can climb the boulder to the top from here.";
@@ -1346,8 +1353,8 @@
 	      this.description = "You reach the top of the boulder.";
 	      this.location.contents.push(
 	        new Feature ({
-	          name: "trees",
-	          description: "Checking the horizon over the trees reveals",
+	          name: "woods",
+	          description: "Checking the horizon over the woods reveals",
 	          checkText: "The trees are growing thick and fast around the boulder and the bog, but seem to thin out on the other side of the river. In fact, beyond the river you can only see the strange scraggled acacias that have started to surround you in the past few miles of your journey.",
 	          verbs: ["check"],
 	        })
@@ -1381,6 +1388,34 @@
 	  this.location.getNouns();
 	  this.location.player.readArea(this.location);
 	}.bind(area.getNoun('boulder'));
+	
+	module.exports = area;
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Area = __webpack_require__(1);
+	var Feature = __webpack_require__(8);
+	var Box = __webpack_require__(10);
+	var Item = __webpack_require__(11);
+	var Exit = __webpack_require__(7);
+	
+	area = new Area ({
+	  description: "You're walking east down a dirt road, towards a town in the distance. This is as far as you can go right now.",
+	  name: 'eastroad',
+	  worldMap: this,
+	  contents: [
+	    new Exit ({
+	      name: "bridge",
+	      description: "The bridge is behind you.",
+	      checkText: "It's the bridge you crossed to get here.",
+	      destinationName: 'bridge',
+	      verbs: ["check", "go to"],
+	    }),
+	  ],
+	});
 	
 	module.exports = area;
 

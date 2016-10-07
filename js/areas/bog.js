@@ -10,8 +10,8 @@ area = new Area ({
   worldMap: this,
   contents: [
     new Exit ({
-      name: "trees",
-      description: "The trees around you look like their roots are becoming choked with rot.",
+      name: "woods",
+      description: "The woods around you look like their roots are becoming choked with rot.",
       checkText: "You can go back into the trees to try to find the road again.",
       destinationName: 'woods',
       verbs: ["check", "go to"],

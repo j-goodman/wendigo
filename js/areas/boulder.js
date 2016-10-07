@@ -49,7 +49,7 @@ area.getNoun('boulder').climb = function () {
   if (!this.progress) {
     if (dice < 0.3) {
       this.description = "You make it halfway up the boulder, then slip and fall back into the dry dirt.";
-    } else if (dice < 0.6) {
+    } else if (dice < 0.5) {
       this.description = "You manage to grab a handhold two thirds up the rock, but you can't find a place to put your feet and you fall.";
     } else {
       this.description = "You get a grip in a crack two thirds up the face of the rock and find a small raised jut to put your right foot on. You can climb the boulder to the top from here.";
@@ -67,8 +67,8 @@ area.getNoun('boulder').climb = function () {
       this.description = "You reach the top of the boulder.";
       this.location.contents.push(
         new Feature ({
-          name: "trees",
-          description: "Checking the horizon over the trees reveals",
+          name: "woods",
+          description: "Checking the horizon over the woods reveals",
           checkText: "The trees are growing thick and fast around the boulder and the bog, but seem to thin out on the other side of the river. In fact, beyond the river you can only see the strange scraggled acacias that have started to surround you in the past few miles of your journey.",
           verbs: ["check"],
         })

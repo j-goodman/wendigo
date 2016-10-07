@@ -13,11 +13,11 @@ area = new Area ({
   },
   contents: [
     new Exit ({
-      name: "trees",
-      description: "You can hear cicadas rattling in the trees surrounding you",
+      name: "woods",
+      description: "You can hear cicadas rattling in the woods surrounding you",
       checkText: "The trees are growing smaller and farther apart here in the higher altitudes of the plateau. Past the river ahead of you they seem to die out entirely except for the dry shrubby acacias.",
       destinationName: 'woods',
-      verbs: ["check"],
+      verbs: ["check", "go to"],
     }),
     new Feature ({
       name: "river",

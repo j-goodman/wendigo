@@ -22,6 +22,11 @@ var fighter = new Fighter ({
       this.name = "~~";
       this.description = "";
       this.location.player.readArea(this.location);
+      var east; var west;
+      east = this.location.getNoun('east bank');
+      west = this.location.getNoun('west bank');
+      west.description = "From here you can go to the west bank";
+      east.description = "or the east bank.";
     }.bind(this), 8500);
     this.location.getNouns();
     var door = this.location.getNoun('east bank');
