@@ -14,7 +14,7 @@ area = new Area ({
     new Feature ({
       name: "bridge",
       description: "",
-      checkText: "It's a steel truss bridge, with rusted beams meeting overhead in a row of three triangles on each side. It looks like it was once painted green, but that's mostly chipped off.",
+      checkText: "It's a steel truss bridge over a deep river, with rusted beams meeting overhead in a row of three triangles on each side. It looks like it was once painted green, but that's mostly chipped off.",
       verbs: ["check"],
     }),
     new Feature ({
