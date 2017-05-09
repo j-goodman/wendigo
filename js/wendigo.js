@@ -736,12 +736,12 @@
 	// worldMap.wheatfield = require('./areas/wheatfield.js');
 	// worldMap.end = require('./areas/end.js');
 	worldMap.road = __webpack_require__(9);
-	worldMap.eastroad = __webpack_require__(18);
-	worldMap.bridge = __webpack_require__(12);
-	worldMap.woods = __webpack_require__(14);
-	worldMap.bog = __webpack_require__(15);
-	worldMap.clearing = __webpack_require__(16);
-	worldMap.boulder = __webpack_require__(17);
+	worldMap.eastroad = __webpack_require__(12);
+	worldMap.bridge = __webpack_require__(13);
+	worldMap.woods = __webpack_require__(15);
+	worldMap.bog = __webpack_require__(16);
+	worldMap.clearing = __webpack_require__(17);
+	worldMap.boulder = __webpack_require__(18);
 	
 	module.exports = worldMap;
 
@@ -984,7 +984,35 @@
 	var Item = __webpack_require__(11);
 	var Exit = __webpack_require__(7);
 	
-	var theDevil = __webpack_require__(13);
+	area = new Area ({
+	  description: "You're walking east down a dirt road, towards a town in the distance. This is as far as you can go right now.",
+	  name: 'eastroad',
+	  worldMap: this,
+	  contents: [
+	    new Exit ({
+	      name: "bridge",
+	      description: "The bridge is behind you.",
+	      checkText: "It's the bridge you crossed to get here.",
+	      destinationName: 'bridge',
+	      verbs: ["check", "go to"],
+	    }),
+	  ],
+	});
+	
+	module.exports = area;
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var Area = __webpack_require__(1);
+	var Feature = __webpack_require__(8);
+	var Box = __webpack_require__(10);
+	var Item = __webpack_require__(11);
+	var Exit = __webpack_require__(7);
+	
+	var theDevil = __webpack_require__(14);
 	
 	area = new Area ({
 	  description: "You step out onto the steel bridge.",
@@ -994,7 +1022,7 @@
 	    new Feature ({
 	      name: "bridge",
 	      description: "",
-	      checkText: "It's a steel truss bridge, with rusted beams meeting overhead in a row of three triangles on each side. It looks like it was once painted green, but that's mostly chipped off.",
+	      checkText: "It's a steel truss bridge over a deep river, with rusted beams meeting overhead in a row of three triangles on each side. It looks like it was once painted green, but that's mostly chipped off.",
 	      verbs: ["check"],
 	    }),
 	    new Feature ({
@@ -1029,7 +1057,7 @@
 
 
 /***/ },
-/* 13 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Fighter = __webpack_require__(5);
@@ -1038,7 +1066,7 @@
 	  name: "the Devil",
 	  description: "The bridge is guarded by a tall man wearing a red horned mask of the Devil's face.",
 	  checkText: "He's wearing a smiling red painted mask with horns, yellow eyes, and a beard that looks like it's made of black steel wool. It's tied around the back of his head with a string. He's holding a white steel sword and facing you. He makes no move to attack you.",
-	  verbs: ["check", "attack"],
+	  verbs: ["check"],
 	  hitpoints: 100,
 	  onDeath: function () {
 	    this.checkText = "";
@@ -1104,7 +1132,7 @@
 
 
 /***/ },
-/* 14 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
@@ -1152,7 +1180,7 @@
 
 
 /***/ },
-/* 15 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
@@ -1187,7 +1215,7 @@
 
 
 /***/ },
-/* 16 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
@@ -1281,7 +1309,7 @@
 
 
 /***/ },
-/* 17 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var Area = __webpack_require__(1);
@@ -1388,34 +1416,6 @@
 	  this.location.getNouns();
 	  this.location.player.readArea(this.location);
 	}.bind(area.getNoun('boulder'));
-	
-	module.exports = area;
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var Area = __webpack_require__(1);
-	var Feature = __webpack_require__(8);
-	var Box = __webpack_require__(10);
-	var Item = __webpack_require__(11);
-	var Exit = __webpack_require__(7);
-	
-	area = new Area ({
-	  description: "You're walking east down a dirt road, towards a town in the distance. This is as far as you can go right now.",
-	  name: 'eastroad',
-	  worldMap: this,
-	  contents: [
-	    new Exit ({
-	      name: "bridge",
-	      description: "The bridge is behind you.",
-	      checkText: "It's the bridge you crossed to get here.",
-	      destinationName: 'bridge',
-	      verbs: ["check", "go to"],
-	    }),
-	  ],
-	});
 	
 	module.exports = area;
 

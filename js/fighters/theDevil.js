@@ -4,7 +4,7 @@ var fighter = new Fighter ({
   name: "the Devil",
   description: "The bridge is guarded by a tall man wearing a red horned mask of the Devil's face.",
   checkText: "He's wearing a smiling red painted mask with horns, yellow eyes, and a beard that looks like it's made of black steel wool. It's tied around the back of his head with a string. He's holding a white steel sword and facing you. He makes no move to attack you.",
-  verbs: ["check", "attack"],
+  verbs: ["check"],
   hitpoints: 100,
   onDeath: function () {
     this.checkText = "";
