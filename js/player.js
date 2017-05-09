@@ -190,7 +190,9 @@ Player.prototype.highlight = function (text) {
           output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
         }
         text = output;
-      } else if (verbs.includes(text.slice(x, y).toLowerCase())) {
+      } else if (verbs.includes(text.slice(x, y).toLowerCase() &&
+      text.slice(x, y).toLowerCase() !== 'attack') // temporary while in demo mode.
+    ) {
         output = text;
         if (text.slice(x-3, x) !== "<v>") {
           output = [text.slice(0, x), "<v>", text.slice(x)].join('');

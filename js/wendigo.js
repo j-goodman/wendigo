@@ -574,7 +574,9 @@
 	          output = [output.slice(0, y+3), "</n>", output.slice(y+3)].join('');
 	        }
 	        text = output;
-	      } else if (verbs.includes(text.slice(x, y).toLowerCase())) {
+	      } else if (verbs.includes(text.slice(x, y).toLowerCase() &&
+	      text.slice(x, y).toLowerCase() !== 'attack') // temporary while in demo mode.
+	    ) {
 	        output = text;
 	        if (text.slice(x-3, x) !== "<v>") {
 	          output = [text.slice(0, x), "<v>", text.slice(x)].join('');
@@ -1066,7 +1068,7 @@
 	  name: "the Devil",
 	  description: "The bridge is guarded by a tall man wearing a red horned mask of the Devil's face.",
 	  checkText: "He's wearing a smiling red painted mask with horns, yellow eyes, and a beard that looks like it's made of black steel wool. It's tied around the back of his head with a string. He's holding a white steel sword and facing you. He makes no move to attack you.",
-	  verbs: ["check"],
+	  verbs: ["check", "attack"],
 	  hitpoints: 100,
 	  onDeath: function () {
 	    this.checkText = "";
